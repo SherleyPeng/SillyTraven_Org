@@ -1,18 +1,14 @@
 import json
 
-JP = r'I:\AI\SillyTaven\角色卡\RealWorld\SillyTraven_Org\RealWorld_v1.1.1.card.json'
+JP = r'I:\AI\SillyTaven\角色卡\RealWorld\SillyTraven_Org\RealWorld.card.json'
 with open(JP, 'r', encoding='utf-8') as f:
     card = json.load(f)
 
-for e in card['data']['character_book']['entries']:
-    if e['uid'] == 1:
-        content = e['content']
-        print(f'InitVar content length: {len(content)} chars')
-        print('---')
-        print(content[:2000])
-        print('---')
-        # Check for critical sections
-        checks = ['time:', 'profile:', 'stats:', 'physical:', 'finance:', 'kotodama:', '_uid_counters:']
-        for c in checks:
-            found = c in content
-            print(f'  Has "{c}": {found}')
+scripts = card['data']['extensions']['tavern_helper']['scripts']
+s = scripts[1]
+content = s['content']
+for k, v in content.items():
+    val_str = str(v)
+    if len(val_str) > 200:
+        val_str = val_str[:200] + '...'
+    print(f'content.{k}: {val_str}')

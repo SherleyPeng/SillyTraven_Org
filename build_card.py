@@ -79,6 +79,23 @@ hide_dump = {
 regexes.append(hide_dump)
 print(f'Added regex: {hide_dump["scriptName"]}')
 
+# ── 3b. Add kotodama dedup script ──
+dedup_js = read_src('09k-kotodama-dedup.js')
+dedup_script = {
+    "info": "变量数组去重——双重UpdateVariable兜底，自动合并kotodama记录和finance交易的重复条目",
+    "id": "array-dedup-v1",
+    "type": "script",
+    "data": {},
+    "content": dedup_js,
+    "button": {"buttons": [], "enabled": False},
+    "name": "变量数组去重(kotodama+finance)",
+    "export_with": {"button": True, "data": True},
+    "enabled": True
+}
+scripts = data['extensions']['tavern_helper']['scripts']
+scripts.append(dedup_script)
+print(f'Added script: {dedup_script["name"]}')
+
 # ── 4. Write updated card JSON ──
 out_json_path = os.path.join(BASE, 'RealWorld_v1.2.0.card.json')
 with open(out_json_path, 'w', encoding='utf-8') as f:
