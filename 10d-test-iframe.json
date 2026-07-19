@@ -1,0 +1,10 @@
+{
+  "scriptName": "状态栏测试",
+  "findRegex": "/<StatusBar\\/>/gm",
+  "replaceString": "```html\n<h1 style='color:red;background:#111;padding:20px;text-align:center'>IFRAME TEST OK</h1>\n```",
+  "placement": [2],
+  "markdownOnly": true,
+  "promptOnly": false,
+  "disabled": false,
+  "runOnEdit": true
+}
