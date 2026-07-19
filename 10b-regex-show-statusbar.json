@@ -1,7 +1,7 @@
 {
   "scriptName": "状态栏显示",
   "findRegex": "/<StatusBar\\/>/gm",
-  "replaceString": "<body><script>$('body').load('http://localhost:8888/07-statusbar.html');</script></body>",
+  "replaceString": "<div id=\"sb-placeholder\"><span style=\"color:#888;font-size:12px;\">状态栏加载中...</span></div><script>(function(){$('#sb-placeholder').load('https://sherleypeng.github.io/SillyTraven_Org/07-statusbar-fragment.html',function(r,s,x){if(s==='error'){$('#sb-placeholder').html('<span style=\"color:red\">状态栏加载失败 HTTP '+x.status+'</span>');}});})();</script>",
   "placement": [2],
   "markdownOnly": true,
   "promptOnly": false,
