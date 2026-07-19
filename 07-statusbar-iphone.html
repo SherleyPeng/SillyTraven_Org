@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StatusBar</title>
+<style>
+:root {
+  --bg: #000;
+  --glass: rgba(255,255,255,0.08);
+  --glass2: rgba(255,255,255,0.12);
+  --glass3: rgba(255,255,255,0.16);
+  --border: rgba(255,255,255,0.10);
+  --text: #e5e5e7;
+  --dim: #8e8e93;
+  --dimmer: #636366;
+  --bright: #fff;
+  --blue: #0a84ff;
+  --green: #30d158;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+  --pink: #ff375f;
+  --purple: #bf5af2;
+  --teal: #64d2ff;
+  --yellow: #ffd60a;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-md: 13px;
+  --font-lg: 15px;
+  --font-xl: 17px;
+  --font-2xl: 20px;
+  --font-3xl: 28px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size: var(--font-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  width: 380px;
+  height: 680px;
+  margin: 0 auto;
+}
+.iphone {
+  width: 380px; height: 680px;
+  background: #000;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+
+/* Notch */
+.notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 28px;
+  background: #000;
+  border-radius: 0 0 18px 18px;
+  z-index: 100;
+}
+.statusbar {
+  display: flex; justify-content: space-between;
+  padding: 12px 28px 6px;
+  font-size: 11px; font-weight: 600; color: var(--text);
+  position: relative; z-index: 99;
+}
+.statusbar .time { letter-spacing: .5px; }
+.statusbar .icons { display: flex; gap: 4px; align-items: center; }
+.statusbar .icons span { font-size: 10px; }
+
+/* Home Screen */
+.home { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding-top: 48px; display: flex; flex-direction: column; }
+.home-bg { position: absolute; inset: 0; background: linear-gradient(180deg, #1c1c1e 0%, #000 100%); }
+.home-content { position: relative; flex: 1; padding: 12px 20px; display: flex; flex-direction: column; }
+.app-row { display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.app-icon { 
+  width: 68px; height: 84px; display: flex; flex-direction: column; align-items: center; 
+  gap: 5px; cursor: pointer; transition: transform .15s;
+}
+.app-icon:active { transform: scale(0.85); }
+.app-icon .icon {
+  width: 56px; height: 56px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff; font-weight: 600;
+  position: relative; overflow: hidden;
+}
+.app-icon .label { font-size: 10px; color: var(--text); text-align: center; letter-spacing: .2px; }
+.icon-person { background: linear-gradient(135deg, #5856d6, #af52de); }
+.icon-bank { background: linear-gradient(135deg, #30d158, #32d74b); }
+.icon-cal { background: linear-gradient(135deg, #ff375f, #ff453a); }
+.icon-cal .day { font-size: 22px; font-weight: 700; line-height: 1; }
+.icon-contacts { background: linear-gradient(135deg, #5e5ce6, #8e8e93); }
+.icon-lover { background: linear-gradient(135deg, #ff375f, #ff6482); }
+.icon-wechat { background: linear-gradient(135deg, #30c752, #30d158); }
+.icon-weibo { background: linear-gradient(135deg, #ff6b35, #ff3b30); }
+
+/* Dock */
+.dock {
+  margin-top: auto; padding: 8px 12px; 
+  background: rgba(255,255,255,0.12); backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 28px; display: flex; justify-content: center; gap: 20px;
+}
+
+/* App Pages (fullscreen overlays) */
+.app-page {
+  position: absolute; inset: 0; z-index: 200;
+  background: #000; display: none; flex-direction: column;
+  padding-top: 44px;
+}
+.app-page.open { display: flex; }
+.app-nav {
+  display: flex; align-items: center; padding: 8px 16px;
+  gap: 12px; min-height: 44px;
+}
+.app-nav .back {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--glass2); border: none; color: var(--blue);
+  font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.app-nav .back:hover { background: var(--glass3); }
+.app-nav .title {
+  font-size: var(--font-xl); font-weight: 600; color: var(--text);
+}
+.app-body {
+  flex: 1; overflow-y: auto; padding: 8px 16px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS Cells */
+.cell {
+  background: var(--glass); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 8px;
+}
+.cell-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cell-title { font-size: var(--font-md); font-weight: 600; color: var(--bright); }
+.cell-sub { font-size: var(--font-xs); color: var(--dim); }
+.cell-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: var(--font-sm); }
+.cell-row:last-child { border-bottom: none; }
+.cell-row .lbl { color: var(--dim); }
+.cell-row .val { color: var(--text); font-weight: 500; }
+
+/* Grid for profile */
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+.profile-field { display: flex; flex-direction: column; }
+.profile-field .fl { font-size: var(--font-xs); color: var(--dim); text-transform: uppercase; letter-spacing: .5px; }
+.profile-field .fv { font-size: var(--font-md); color: var(--text); }
+
+/* Asset card */
+.asset-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+.asset-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.06); }
+.asset-name { font-size: var(--font-md); color: var(--text); }
+.asset-val { font-size: var(--font-xl); font-weight: 600; color: var(--green); }
+
+/* Transaction */
+.tx-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: var(--font-xs); }
+.tx-cat { color: var(--dim); width: 48px; flex-shrink: 0; }
+.tx-note { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-date { color: var(--dimmer); width: 60px; flex-shrink: 0; text-align: right; }
+.tx-amt { font-weight: 600; width: 64px; flex-shrink: 0; text-align: right; }
+.tx-amt.in { color: var(--green); }
+.tx-amt.out { color: var(--red); }
+
+/* Time display */
+.time-display { text-align: center; padding: 16px 0; }
+.time-clock { font-size: 48px; font-weight: 200; color: var(--bright); letter-spacing: 3px; }
+.time-date { font-size: var(--font-xl); color: var(--text); margin-top: 4px; }
+.time-weekday { font-size: var(--font-lg); color: var(--blue); margin-top: 2px; }
+.time-info { font-size: var(--font-md); color: var(--dim); margin-top: 8px; }
+
+/* NPC Card */
+.npc-card {
+  background: var(--glass); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px; margin-bottom: 6px; cursor: pointer;
+  transition: background .15s;
+}
+.npc-card:hover { background: var(--glass2); }
+.npc-card-hd { display: flex; justify-content: space-between; align-items: center; }
+.npc-name { font-size: var(--font-md); font-weight: 600; color: var(--bright); }
+.npc-age { font-size: var(--font-xs); color: var(--dim); }
+.npc-stats { display: flex; gap: 12px; margin-top: 6px; font-size: var(--font-xs); }
+.npc-stat { color: var(--dim); }
+.npc-stat-val { color: var(--text); }
+
+/* Bars */
+.bar-wrap { width: 50px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 4px; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+.bar-fill.aff { background: var(--pink); }
+.bar-fill.obed { background: var(--blue); }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 9px; font-weight: 600; }
+.badge.safe { background: rgba(48,209,88,0.2); color: var(--green); }
+.badge.fertile { background: rgba(255,159,10,0.2); color: var(--orange); }
+.badge.period { background: rgba(255,69,58,0.2); color: var(--red); }
+
+/* WeChat style */
+.wx-msg-list { display: flex; flex-direction: column; gap: 1px; }
+.wx-contact {
+  display: flex; align-items: center; gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+}
+.wx-avatar {
+  width: 44px; height: 44px; border-radius: 6px;
+  background: var(--glass2); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 600; color: var(--dim); flex-shrink: 0;
+}
+.wx-info { flex: 1; min-width: 0; }
+.wx-name { font-size: var(--font-md); font-weight: 500; color: var(--text); }
+.wx-preview { font-size: var(--font-xs); color: var(--dim); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wx-time { font-size: 10px; color: var(--dimmer); flex-shrink: 0; }
+.wx-chat { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
+.wx-bubble {
+  max-width: 75%; padding: 8px 12px; border-radius: 16px;
+  font-size: var(--font-sm); line-height: 1.5; word-break: break-word;
+}
+.wx-bubble.me { align-self: flex-end; background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+.wx-bubble.you { align-self: flex-start; background: var(--glass2); color: var(--text); border-bottom-left-radius: 4px; }
+.wx-bubble-time { font-size: 10px; color: var(--dimmer); align-self: center; margin: 2px 0; }
+
+/* Weibo style */
+.wb-post {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 8px;
+}
+.wb-post-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--glass2); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.wb-user { font-size: var(--font-sm); font-weight: 500; color: var(--text); }
+.wb-badge { font-size: 9px; color: var(--orange); margin-left: 4px; }
+.wb-time { font-size: 9px; color: var(--dimmer); margin-left: auto; }
+.wb-title { font-size: var(--font-md); font-weight: 600; color: var(--bright); margin-bottom: 4px; }
+.wb-body { font-size: var(--font-sm); color: var(--dim); line-height: 1.6; }
+.wb-cat { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9px; margin-bottom: 6px; }
+.wb-cat.tech { background: rgba(10,132,255,0.2); color: var(--blue); }
+.wb-cat.ent { background: rgba(191,90,242,0.2); color: var(--purple); }
+.wb-cat.pol { background: rgba(255,159,10,0.2); color: var(--orange); }
+.wb-cat.soc { background: rgba(48,209,88,0.2); color: var(--green); }
+
+/* Modal for NPC detail */
+.npc-modal {
+  position: absolute; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.95); backdrop-filter: blur(30px);
+  display: none; flex-direction: column; padding-top: 44px;
+}
+.npc-modal.open { display: flex; }
+.npc-modal-nav { display: flex; align-items: center; padding: 8px 16px; gap: 12px; }
+.npc-modal-body { flex: 1; overflow-y: auto; padding: 8px 16px 20px; }
+.npc-section { margin-bottom: 14px; }
+.npc-section-title { font-size: var(--font-xs); font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.npc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
+.npc-field { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 6px 8px; }
+.npc-fl { font-size: 10px; color: var(--dim); }
+.npc-fv { font-size: 12px; color: var(--text); margin-top: 2px; }
+
+/* Tags */
+.tag { display: inline-block; background: var(--glass2); border-radius: 4px; padding: 1px 5px; font-size: 10px; margin: 1px; }
+.tag.vg { color: var(--green); }
+.tag.nvg { color: var(--orange); }
+.tag.pg { color: var(--red); }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px 20px; color: var(--dim); font-size: var(--font-md); }
+.empty .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.app-page.open { animation: fadeIn .25s ease-out; }
+</style>
+</head>
+<body>
+<div class="iphone">
+  <!-- Notch -->
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time" id="sb-time">13:00</span>
+    <span class="icons"><span>●●●●○</span><span>WiFi</span><span>🔋</span></span>
+  </div>
+
+  <!-- ====== HOME SCREEN ====== -->
+  <div class="home" id="home">
+    <div class="home-bg"></div>
+    <div class="home-content">
+      <div class="app-row">
+        <div class="app-icon" data-app="profile"><div class="icon icon-person">👤</div><div class="label">人物</div></div>
+        <div class="app-icon" data-app="bank"><div class="icon icon-bank">🏦</div><div class="label">银行</div></div>
+        <div class="app-icon" data-app="calendar"><div class="icon icon-cal"><span class="day" id="cal-day">14</span></div><div class="label">日历</div></div>
+        <div class="app-icon" data-app="contacts"><div class="icon icon-contacts">📇</div><div class="label">联系人</div></div>
+      </div>
+      <div class="app-row">
+        <div class="app-icon" data-app="lover"><div class="icon icon-lover">💕</div><div class="label">Lover</div></div>
+        <div class="app-icon" data-app="wechat"><div class="icon icon-wechat">💬</div><div class="label">微信</div></div>
+        <div class="app-icon" data-app="weibo"><div class="icon icon-weibo">📰</div><div class="label">微博</div></div>
+      </div>
+      <div class="dock">
+        <div class="app-icon" data-app="wechat"><div class="icon icon-wechat" style="width:48px;height:48px;font-size:20px">💬</div><div class="label" style="display:none">微信</div></div>
+        <div class="app-icon" data-app="lover"><div class="icon icon-lover" style="width:48px;height:48px;font-size:20px">💕</div><div class="label" style="display:none">Lover</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PROFILE PAGE ====== -->
+  <div class="app-page" id="app-profile">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">人物</span></div>
+    <div class="app-body" id="body-profile"></div>
+  </div>
+
+  <!-- ====== BANK PAGE ====== -->
+  <div class="app-page" id="app-bank">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">银行</span></div>
+    <div class="app-body" id="body-bank"></div>
+  </div>
+
+  <!-- ====== CALENDAR PAGE ====== -->
+  <div class="app-page" id="app-calendar">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">日历</span></div>
+    <div class="app-body" id="body-calendar"></div>
+  </div>
+
+  <!-- ====== CONTACTS PAGE ====== -->
+  <div class="app-page" id="app-contacts">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">联系人</span></div>
+    <div class="app-body" id="body-contacts"></div>
+  </div>
+
+  <!-- ====== LOVER PAGE ====== -->
+  <div class="app-page" id="app-lover">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">Lover</span></div>
+    <div class="app-body" id="body-lover"></div>
+  </div>
+
+  <!-- ====== WECHAT PAGE ====== -->
+  <div class="app-page" id="app-wechat">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">微信</span></div>
+    <div class="app-body" id="body-wechat"></div>
+  </div>
+  <!-- WeChat chat view -->
+  <div class="app-page" id="app-wxchat">
+    <div class="app-nav"><button class="back" data-back="wechat">←</button><span class="title" id="wxchat-title">聊天</span></div>
+    <div class="app-body" id="body-wxchat"></div>
+  </div>
+
+  <!-- ====== WEIBO PAGE ====== -->
+  <div class="app-page" id="app-weibo">
+    <div class="app-nav"><button class="back" data-back="home">←</button><span class="title">微博</span></div>
+    <div class="app-body" id="body-weibo"></div>
+  </div>
+
+  <!-- ====== NPC DETAIL MODAL ====== -->
+  <div class="npc-modal" id="npc-modal">
+    <div class="npc-modal-nav"><button class="back" data-back="lover">←</button><span class="title" id="npc-modal-title"></span></div>
+    <div class="npc-modal-body" id="npc-modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var cur = {}, sig = '', lastGood = null, isRefreshing = false, initDone = false;
+  var WX_CHAT_CONTACT = null;
+
+  function g(obj,path,def){if(!obj||!path)return def;var k=path.replace(/\[(\d+)\]/g,'.$1').split('.'),c=obj;for(var i=0;i<k.length;i++){if(c==null)return def;c=c[k[i]];}return c!=null?c:def;}
+  function s(v,d){return(v==null||v==='')?(d||'-'):String(v);}
+  function n(v,d){var x=Number(v);return isNaN(x)?(d!=null?String(d):'0'):String(x);}
+  function bar(v,m,c){var p=Math.min(100,Math.max(0,(Number(v)||0)/(Number(m)||1)*100));return'<span class="bar-wrap"><span class="bar-fill '+c+'" style="width:'+p+'%"></span></span>'+Math.round(p);}
+  function esc(v){return s(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function readData(){
+    if(typeof Mvu!=='undefined'&&Mvu.getMvuData){try{var r=Mvu.getMvuData({type:'message',message_id:'latest'});if(r&&r.stat_data&&Object.keys(r.stat_data).length>0)return r.stat_data;}catch(e){}try{var r=Mvu.getMvuData({type:'message',message_id:0});if(r&&r.stat_data&&Object.keys(r.stat_data).length>0)return r.stat_data;}catch(e){}}
+    if(typeof getVariables==='function'){try{var v=getVariables({type:'message',message_id:'latest'});if(v&&v.stat_data&&Object.keys(v.stat_data).length>0)return v.stat_data;}catch(e){}try{var v=getVariables({type:'message',message_id:0});if(v&&v.stat_data&&Object.keys(v.stat_data).length>0)return v.stat_data;}catch(e){}}
+    return lastGood||{};
+  }
+
+  // === RENDER: Profile ===
+  function rProfile(d){
+    var p=d.profile||{},bg=p.background||{},st=p.status||{},app=p.appearance||{},inv=p.inventory||[],rels=p.relationships||{};
+    var h='';
+    h+='<div class="cell"><div class="cell-hd"><span class="cell-title">'+esc(p.name)+'</span><span class="cell-sub">'+esc(p.occupation)+'</span></div>';
+    h+='<div class="profile-grid">';
+    h+='<div class="profile-field"><span class="fl">性别</span><span class="fv">'+esc(p.gender)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">年龄</span><span class="fv">'+n(p.age)+'岁</span></div>';
+    h+='<div class="profile-field"><span class="fl">出生</span><span class="fv">'+n(p.birth_year)+'.'+n(p.birth_month)+'.'+n(p.birth_day)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">外貌</span><span class="fv">'+esc(app.build)+(app.full?', '+esc(app.full):'')+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">身体状态</span><span class="fv">'+esc(st.physical)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">精神状态</span><span class="fv">'+esc(st.mental)+'</span></div>';
+    h+='</div></div>';
+    h+='<div class="cell"><div class="cell-title" style="margin-bottom:6px">背景</div><div class="profile-grid">';
+    h+='<div class="profile-field"><span class="fl">家乡</span><span class="fv">'+esc(bg.hometown)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">教育</span><span class="fv">'+esc(bg.education)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">居住</span><span class="fv">'+esc(bg.living)+'</span></div>';
+    h+='<div class="profile-field"><span class="fl">求职</span><span class="fv">'+esc(bg.job_status)+'</span></div>';
+    h+='</div></div>';
+    if(p.personality)h+='<div class="cell"><div class="cell-title" style="margin-bottom:4px">性格</div><div style="font-size:var(--font-xs);color:var(--dim);line-height:1.6">'+esc(p.personality).replace(/\n/g,'<br>')+'</div></div>';
+    if(inv.length){h+='<div class="cell"><div class="cell-title" style="margin-bottom:6px">随身物品</div>';for(var i=0;i<inv.length;i++)h+='<span class="tag">'+esc(inv[i].name)+(inv[i].desc?' ('+esc(inv[i].desc)+')':'')+'</span>';h+='</div>';}
+    var rk=Object.keys(rels);if(rk.length){h+='<div class="cell"><div class="cell-title" style="margin-bottom:6px">亲密关系</div>';
+    for(var ri=0;ri<rk.length;ri++){var r=rels[rk[ri]];h+='<div class="cell-row"><span class="lbl">'+esc(r.name)+'</span><span class="val">'+esc(r.relation)+' - '+esc(r.status)+'</span></div>';}h+='</div>';}
+    return h;
+  }
+
+  // === RENDER: Bank ===
+  function rBank(d){
+    var f=d.finance||{},a=f.assets||{},tx=f.transactions||[],ak=Object.keys(a);
+    var h='<div class="cell"><div class="cell-title" style="margin-bottom:8px">资产</div>';
+    if(ak.length)for(var i=0;i<ak.length;i++)h+='<div class="asset-row"><span class="asset-name">'+esc(ak[i])+'</span><span class="asset-val">¥'+n(a[ak[i]],'0')+'</span></div>';
+    else h+='<div class="empty"><div class="empty-icon">🏦</div>暂无资产记录</div>';
+    h+='</div>';
+    if(tx.length){h+='<div class="cell"><div class="cell-title" style="margin-bottom:6px">最近收支</div>';
+    var st=Math.max(0,tx.length-10);for(var ti=st;ti<tx.length;ti++){var t=tx[ti],inc=t.type==='收入';h+='<div class="tx-row"><span class="tx-cat">'+esc(t.category)+'</span><span class="tx-note">'+esc(t.note)+'</span><span class="tx-date">'+esc(t.date)+'</span><span class="tx-amt '+(inc?'in':'out')+'">'+(inc?'+':'')+'¥'+n(t.amount,'0')+'</span></div>';}
+    h+='</div>';}
+    return h;
+  }
+
+  // === RENDER: Calendar ===
+  function rCalendar(d){
+    var t=d.time||{};
+    var h='<div class="time-display"><div class="time-clock">'+String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0')+'</div>';
+    h+='<div class="time-date">'+n(t.year)+'年'+n(t.month)+'月'+n(t.day)+'日</div>';
+    h+='<div class="time-weekday">'+esc(t.weekday)+'</div>';
+    h+='<div class="time-info">'+esc(t.weather)+' · '+esc(t.season)+'</div></div>';
+    return h;
+  }
+
+  // === RENDER: Contacts (non-romantic) ===
+  function rContacts(d){
+    var ml=d.npc_male||{},rels=d.profile&&d.profile.relationships||{},sx=d.sexual||{};
+    var mk=Object.keys(ml),rk=Object.keys(rels),h='';
+    var hasAny=false;
+    // Male NPCs
+    if(mk.length){for(var mi=0;mi<mk.length;mi++){var mn=ml[mk[mi]];hasAny=true;
+    h+='<div class="cell"><div class="cell-hd"><span class="cell-title">'+esc(mn.name)+'</span><span class="cell-sub">'+n(mn.age)+'岁</span></div><div class="cell-row"><span class="lbl">职业</span><span class="val">'+esc(mn.occupation)+'</span></div><div class="cell-row"><span class="lbl">关系</span><span class="val">'+esc(mn.social_status)+'</span></div></div>';
+    }}
+    // Non-romantic relationships
+    for(var ri=0;ri<rk.length;ri++){var rel=rels[rk[ri]];if(rel.relation&&rel.relation.indexOf('女友')<0&&rel.relation.indexOf('恋人')<0&&rel.relation.indexOf('情人')<0){hasAny=true;
+    h+='<div class="cell"><div class="cell-hd"><span class="cell-title">'+esc(rel.name)+'</span></div><div class="cell-row"><span class="lbl">关系</span><span class="val">'+esc(rel.relation)+' - '+esc(rel.status)+'</span></div></div>';
+    }}
+    if(!hasAny)h='<div class="empty"><div class="empty-icon">📇</div>暂无联系人</div>';
+    return h;
+  }
+
+  // === RENDER: Lover ===
+  function rLover(d){
+    var sx=d.sexual||{},sk=Object.keys(sx),h='';
+    if(!sk.length)return'<div class="empty"><div class="empty-icon">💕</div>暂无恋人</div>';
+    for(var i=0;i<sk.length;i++){
+      var u=sk[i],sn=sx[u],ph=g(sn,'menstrual.current_phase','安全期');
+      var bc=({'安全期':'safe','受孕期':'fertile','月经中':'period'})[ph]||'';
+      h+='<div class="npc-card" data-uid="'+u+'"><div class="npc-card-hd"><span class="npc-name">'+esc(sn.name)+'</span><span class="npc-age">'+n(sn.age)+'岁</span></div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-top:2px">'+esc(sn.outfit)+'</div>';
+      h+='<div class="npc-stats"><span class="npc-stat">好感 '+bar(sn.affection,100,'aff')+'</span><span class="npc-stat">服从 '+bar(sn.obedience,100,'obed')+'</span><span class="badge '+bc+'">'+esc(ph)+'</span></div>';
+      h+='<div style="margin-top:3px">'+(sn.is_virgin?'<span class="tag vg">处</span>':'<span class="tag nvg">非处</span>')+(g(sn,'uterus.pregnancy')?'<span class="tag pg">孕</span>':'')+'<span style="font-size:10px;color:var(--dimmer);margin-left:4px">经验'+n((sn.experience||{}).total)+'次</span></div>';
+      h+='</div>';
+    }
+    return h;
+  }
+
+  // === RENDER: Modal body ===
+  function rModal(sn){
+    var bp=sn.body_parts||{},br=bp.breasts||{},nip=bp.nipples||{},vag=bp.vagina||{},ut=bp.uterus||{},an=bp.anus||{},mnst=sn.menstrual||{},exp=sn.experience||{};
+    function mf(l,v){return'<div class="npc-field"><div class="npc-fl">'+l+'</div><div class="npc-fv">'+v+'</div></div>';}
+    function bpsec(name,fields){var h='<div class="npc-section"><div class="npc-section-title">'+name+'</div><div class="npc-grid">';for(var i=0;i<fields.length;i++)h+=mf(fields[i][0],fields[i][1]);return h+'</div></div>';}
+    var h='<div class="npc-section"><div class="npc-section-title">基本信息</div><div class="npc-grid">';
+    h+=mf('姓名',esc(sn.name));h+=mf('年龄',n(sn.age)+'岁');h+=mf('出生',n(sn.birth_year)+'.'+n(sn.birth_month)+'.'+n(sn.birth_day));
+    h+=mf('处女',sn.is_virgin?'是':'否');if(!sn.is_virgin&&sn.first_partner)h+=mf('初夜',esc(sn.first_partner));
+    h+=mf('好感',n(sn.affection)+' / 100');h+=mf('服从',n(sn.obedience)+' / 100');
+    h+='</div></div>';
+    h+='<div class="npc-section"><div class="npc-section-title">外貌穿着</div>'+mf('外貌',esc(sn.appearance))+mf('穿着',esc(sn.outfit))+'</div>';
+    if(sn.personality)h+='<div class="npc-section"><div class="npc-section-title">性格</div><div style="font-size:11px;color:var(--dim);line-height:1.6">'+esc(sn.personality).replace(/\n/g,'<br>')+'</div></div>';
+    h+='<div class="npc-section"><div class="npc-section-title">月经</div><div class="npc-grid">';
+    h+=mf('周期',n(mnst.cycle_length,'28')+'天');h+=mf('经期',n(mnst.period_duration,'5')+'天');h+=mf('上次',esc(mnst.last_period_date));h+=mf('状态',esc(mnst.current_phase));
+    h+='</div></div><div class="npc-section"><div class="npc-section-title">性经验</div><div class="npc-grid">';
+    h+=mf('总计',n(exp.total)+'次');h+=mf('口交',n(exp.oral)+'次');h+=mf('插入',n(exp.vaginal)+'次');h+=mf('肛交',n(exp.anal)+'次');h+=mf('高潮',n(sn.orgasm_count)+'次');
+    h+='</div></div>';
+    h+=bpsec('胸部',[['大小',esc(br.size)],['形状',esc(br.shape)],['颜色',esc(br.color)],['敏感度',esc(br.sensitivity)],['状态',esc(br.status)]]);
+    h+=bpsec('乳头',[['形状',esc(nip.shape)],['颜色',esc(nip.color)],['乳晕色',esc(nip.areola_color)],['乳晕大',esc(nip.areola_size)],['敏感度',esc(nip.sensitivity)],['状态',esc(nip.status)]]);
+    h+=bpsec('小穴',[['形状',esc(vag.shape)],['外阴色',esc(vag.color)],['内壁色',esc(vag.inner_color)],['松紧',esc(vag.tightness)],['湿润',esc(vag.wetness)],['敏感度',esc(vag.sensitivity)],['状态',esc(vag.status)]]);
+    h+=bpsec('子宫',[['正常',ut.is_normal?'是':'异常'],['怀孕',ut.pregnancy?esc(ut.pregnancy):'无'],['敏感度',esc(ut.sensitivity)],['状态',esc(ut.status)]]);
+    h+=bpsec('肛门',[['形状',esc(an.shape)],['颜色',esc(an.color)],['松紧',esc(an.tightness)],['敏感度',esc(an.sensitivity)],['开发',an.is_developed?'是':'未'],['状态',esc(an.status)]]);
+    var fet=sn.fetishes||[];if(fet.length){h+='<div class="npc-section"><div class="npc-section-title">性癖</div>';for(var fi=0;fi<fet.length;fi++)h+='<span class="tag">'+esc(fet[fi])+'</span>';h+='</div>';}
+    return h;
+  }
+
+  // === RENDER: WeChat ===
+  function rWeChat(d){
+    var sx=d.sexual||{},ml=d.npc_male||{},rels=(d.profile||{}).relationships||{};
+    var h='<div class="wx-msg-list">';
+    var hasContacts=false;
+    var contacts=[];
+    // Gather contacts from lovers
+    Object.keys(sx).forEach(function(k){contacts.push({name:sx[k].name,lastMsg:'点击查看对话',time:'',type:'lover',uid:k});hasContacts=true;});
+    // From male NPCs
+    Object.keys(ml).forEach(function(k){contacts.push({name:ml[k].name,lastMsg:'暂无消息',time:'',type:'male',uid:k});hasContacts=true;});
+    // From relationships
+    Object.keys(rels).forEach(function(k){var found=contacts.find(function(c){return c.name===rels[k].name});if(!found){contacts.push({name:rels[k].name,lastMsg:'暂无消息',time:'',type:'rel',uid:k});hasContacts=true;}});
+    // Check wechat data
+    var wx=d.wechat||{},wkeys=Object.keys(wx);
+    wkeys.forEach(function(k){var msgs=wx[k].messages||[];var last=msgs.length?msgs[msgs.length-1]:null;var existing=contacts.find(function(c){return c.name===wx[k].name||c.name===k});if(existing){existing.lastMsg=last?(last.from+': '+last.text):'暂无消息';existing.time=last?last.time:'';}else{if(wx[k].name){contacts.push({name:wx[k].name,lastMsg:last?(last.from+': '+last.text):'暂无消息',time:last?last.time:'',type:'wx',uid:k});hasContacts=true;}}});
+
+    if(!hasContacts)return'<div class="empty"><div class="empty-icon">💬</div>暂无联系人消息</div>';
+    contacts.forEach(function(c){
+      h+='<div class="wx-contact" data-wx-name="'+esc(c.name)+'" data-wx-uid="'+esc(c.uid||c.name)+'">';
+      h+='<div class="wx-avatar">'+esc(c.name.charAt(0))+'</div>';
+      h+='<div class="wx-info"><div class="wx-name">'+esc(c.name)+'</div><div class="wx-preview">'+esc(c.lastMsg)+'</div></div>';
+      h+='<div class="wx-time">'+esc(c.time)+'</div></div>';
+    });
+    h+='</div>';
+    return h;
+  }
+
+  // === RENDER: WeChat Chat View ===
+  function rWxChat(d,contactName){
+    var wx=d.wechat||{};
+    var chatData=null;
+    Object.keys(wx).forEach(function(k){if(wx[k].name===contactName||k===contactName)chatData=wx[k];});
+    if(!chatData||!(chatData.messages||[]).length)return'<div class="empty"><div class="empty-icon">💬</div>暂无聊天记录</div>';
+    var msgs=chatData.messages||[];
+    var h='<div class="wx-chat">';
+    msgs.forEach(function(m){
+      var isMe=m.from==='我'||m.from==='me';
+      if(m.time)h+='<div class="wx-bubble-time">'+esc(m.time)+'</div>';
+      h+='<div class="wx-bubble '+(isMe?'me':'you')+'">'+esc(m.text)+'</div>';
+    });
+    h+='</div>';
+    return h;
+  }
+
+  // === RENDER: Weibo ===
+  function rWeibo(d){
+    var wb=d.weibo||{},posts=wb.posts||[];
+    if(!posts.length)return'<div class="empty"><div class="empty-icon">📰</div>暂无微博动态<br><span style="font-size:11px;margin-top:4px;display:block">热点新闻将在剧情推进中生成</span></div>';
+    var h='';
+    posts.forEach(function(p,i){
+      var catCls={'科技':'tech','娱乐':'ent','时政':'pol','社会':'soc'}[p.category]||'soc';
+      h+='<div class="wb-post"><span class="wb-cat '+catCls+'">'+esc(p.category)+'</span>';
+      h+='<div class="wb-post-hd"><div class="wb-avatar">📰</div><span class="wb-user">'+esc(p.source||'微博热搜')+'</span>'+'<span class="wb-time">'+esc(p.time)+'</span></div>';
+      h+='<div class="wb-title">'+esc(p.title)+'</div>';
+      if(p.summary)h+='<div class="wb-body">'+esc(p.summary)+'</div>';
+      h+='</div>';
+    });
+    return h;
+  }
+
+  // === MAIN REFRESH ===
+  function refresh(){
+    if(isRefreshing)return;isRefreshing=true;
+    try{
+      var d=readData();
+      if(d&&Object.keys(d).length>0){var ns=JSON.stringify(d);if(ns!==sig){sig=ns;lastGood=d;}}
+      var sd=lastGood||{};cur=sd;
+      // Update status bar time
+      var t=sd.time||{};
+      var el=document.getElementById('sb-time');if(el)el.textContent=String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0');
+      var cd=document.getElementById('cal-day');if(cd)cd.textContent=String(t.day||14);
+      // Render pages
+      setHtml('body-profile',rProfile(sd));
+      setHtml('body-bank',rBank(sd));
+      setHtml('body-calendar',rCalendar(sd));
+      setHtml('body-contacts',rContacts(sd));
+      setHtml('body-lover',rLover(sd));
+      setHtml('body-wechat',rWeChat(sd));
+      setHtml('body-weibo',rWeibo(sd));
+      bindNpcClicks();
+      bindWxContacts();
+    }catch(e){console.error('SB refresh:',e);}
+    isRefreshing=false;
+  }
+  function setHtml(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html||'';}
+
+  // === BINDINGS ===
+  function bindNpcClicks(){
+    document.querySelectorAll('#body-lover .npc-card').forEach(function(c){
+      if(c._b)return;c._b=true;
+      c.addEventListener('click',function(){
+        var uid=c.getAttribute('data-uid'),sn=g(cur,'sexual.'+uid);
+        if(!sn)return;
+        document.getElementById('npc-modal-title').textContent=s(sn.name)+' - 详情';
+        document.getElementById('npc-modal-body').innerHTML=rModal(sn);
+        document.getElementById('npc-modal').classList.add('open');
+      });
+    });
+  }
+  function bindWxContacts(){
+    document.querySelectorAll('#body-wechat .wx-contact').forEach(function(el){
+      if(el._wb)return;el._wb=true;
+      el.addEventListener('click',function(){
+        var name=el.getAttribute('data-wx-name');
+        WX_CHAT_CONTACT=name;
+        document.getElementById('wxchat-title').textContent=name;
+        setHtml('body-wxchat',rWxChat(cur,name));
+        navigateTo('app-wxchat');
+      });
+    });
+  }
+
+  // === NAVIGATION ===
+  function navigateTo(id){
+    document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('open');});
+    document.getElementById('npc-modal').classList.remove('open');
+    var page=document.getElementById(id);if(page)page.classList.add('open');
+  }
+  function goHome(){
+    document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('open');});
+    document.getElementById('npc-modal').classList.remove('open');
+    document.getElementById('app-wxchat').classList.remove('open');
+  }
+
+  // App icon clicks
+  document.querySelectorAll('.app-icon').forEach(function(icon){
+    icon.addEventListener('click',function(){
+      var app=icon.getAttribute('data-app');
+      if(app==='wechat')navigateTo('app-wechat');
+      else if(app==='lover')navigateTo('app-lover');
+      else if(app==='profile')navigateTo('app-profile');
+      else if(app==='bank')navigateTo('app-bank');
+      else if(app==='calendar')navigateTo('app-calendar');
+      else if(app==='contacts')navigateTo('app-contacts');
+      else if(app==='weibo')navigateTo('app-weibo');
+    });
+  });
+
+  // Back buttons
+  document.querySelectorAll('.back').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var target=btn.getAttribute('data-back');
+      if(target==='home'){goHome();}
+      else if(target==='wechat'){goHome();navigateTo('app-wechat');}
+      else if(target==='lover'){goHome();navigateTo('app-lover');}
+      else{goHome();}
+    });
+  });
+
+  // Modal close
+  document.getElementById('npc-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+
+  // === INIT ===
+  async function init(){
+    try{if(typeof waitGlobalInitialized==='function')await waitGlobalInitialized('Mvu');}catch(e){}
+    try{if(typeof waitUntil==='function')await waitUntil(function(){var d=readData();return d&&Object.keys(d).length>0;},{timeout:15000,intervalBetweenAttempts:300});}catch(e){}
+    refresh();setTimeout(function(){refresh();},600);setTimeout(function(){refresh();},2000);
+    initDone=true;
+    try{if(typeof eventOn==='function'&&typeof Mvu!=='undefined'&&Mvu.events){eventOn(Mvu.events.VARIABLE_UPDATE_ENDED,function(){if(initDone)refresh();});eventOn(Mvu.events.VARIABLE_INITIALIZED,function(){if(initDone){sig='';refresh();}});}}catch(e){}
+    try{if(typeof eventOn==='function'&&typeof tavern_events!=='undefined'){eventOn(tavern_events.MESSAGE_RECEIVED,function(){setTimeout(refresh,800);});eventOn(tavern_events.MESSAGE_UPDATED,function(){setTimeout(refresh,400);});}}catch(e){}
+    setInterval(function(){if(initDone)refresh();},5000);
+  }
+  if(typeof $!=='undefined'){$(function(){init();});}else if(document.readyState==='complete'){init();}else{window.addEventListener('load',init);}
+})();
+</script>
+</body>
+</html>

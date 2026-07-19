@@ -167,12 +167,35 @@ const MaleNPCSchema = z.object({
   social_status: str()
 }).default({}).catch({});
 
+const WeChatMessageSchema = z.object({
+  from: str(),
+  text: str(),
+  time: str()
+}).default({}).catch({});
+
+const WeChatContactSchema = z.object({
+  name: str(),
+  messages: z.array(WeChatMessageSchema).default([]).catch([])
+}).default({}).catch({});
+
+const WeiboPostSchema = z.object({
+  title:    str(),
+  summary:  str(),
+  category: str(),
+  time:     str(),
+  source:   str()
+}).default({}).catch({});
+
 const Schema = z.object({
   time:    TimeSchema,
   profile: ProfileSchema,
   finance: FinanceSchema,
   sexual:   z.object({}).catchall(FemaleNPCSchema).default({}).catch({}),
   npc_male: z.object({}).catchall(MaleNPCSchema).default({}).catch({}),
+  wechat:   z.object({}).catchall(WeChatContactSchema).default({}).catch({}),
+  weibo:    z.object({
+    posts: z.array(WeiboPostSchema).default([]).catch([])
+  }).default({}).catch({}),
   _uid_counters: z.object({
     relationship: num,
     sexual_char:  num,
