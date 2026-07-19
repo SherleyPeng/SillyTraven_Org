@@ -1,0 +1,51 @@
+time:
+  year: 2013
+  month: 12
+  day: 14
+  hour: 13
+  minute: 0
+  weekday: 星期六
+  weather: 晴
+  season: 冬
+
+profile:
+  name: 彭少镭
+  gender: 男
+  age: 18
+  birth_year: 1994
+  birth_month: 12
+  birth_day: 21
+  occupation: 3D建模毕业生，求职中
+  personality: ""
+  appearance:
+    build: 清秀偏瘦
+    full: ""
+  status:
+    physical: 健康
+    mental: 正常
+  inventory:
+    - name: 索尼Xperia P手机
+      desc: 粉色
+    - name: 华硕笔记本电脑
+      desc: GTX660M显卡
+  background:
+    hometown: 吉林省某小镇
+    education: 高一休学 → 高三入北京火星时代学3D建模 → 2013.11毕业
+    living: 与同学合租火星时代校外宿舍楼，月租400元
+    job_status: 投递数十份简历，未获面试
+  relationships: {}
+
+finance:
+  assets:
+    现金: 200
+    建设银行存款: 800
+  transactions: []
+
+sexual: {}
+
+npc_male: {}
+
+_uid_counters:
+  relationship: 0
+  sexual_char: 0
+  npc_male: 0

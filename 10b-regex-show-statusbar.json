@@ -1,0 +1,10 @@
+{
+  "scriptName": "状态栏显示",
+  "findRegex": "/<StatusBar\\/>/gm",
+  "replaceString": "<body><script>$('body').load('http://localhost:8888/07-statusbar.html');</script></body>",
+  "placement": [2],
+  "markdownOnly": true,
+  "promptOnly": false,
+  "disabled": false,
+  "runOnEdit": true
+}

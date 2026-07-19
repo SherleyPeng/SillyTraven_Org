@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root {
+  --bg: #0f0f1a;
+  --glass: rgba(255,255,255,0.06);
+  --glass-hover: rgba(255,255,255,0.10);
+  --glass-border: rgba(255,255,255,0.10);
+  --glass-active: rgba(255,255,255,0.14);
+  --text: #e0e0e0;
+  --text-dim: #888;
+  --text-bright: #fff;
+  --accent: #7c8cf8;
+  --accent-dim: rgba(124,140,248,0.25);
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #34d399;
+  --pink: #f472b6;
+  --radius: 10px;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-md: 13px;
+  --font-lg: 16px;
+  --font-xl: 24px;
+  --font-2xl: 36px;
+  font-size: var(--font-md);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.5;
+  overflow:hidden;
+}
+
+.panel {
+  width:100%;
+  max-width:600px;
+  margin:0 auto;
+  padding:10px;
+}
+
+/* Tab Bar */
+.tab-bar {
+  display:flex;
+  gap:4px;
+  padding:6px;
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  margin-bottom:10px;
+}
+
+.tab {
+  flex:1;
+  padding:8px 4px;
+  border:none;
+  background:transparent;
+  color:var(--text-dim);
+  font-size:var(--font-sm);
+  cursor:pointer;
+  border-radius:8px;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+
+.tab:hover { background:var(--glass-hover); color:var(--text); }
+
+.tab.active {
+  background:var(--accent-dim);
+  color:var(--accent);
+  font-weight:600;
+}
+
+/* Panels */
+.pnl { display:none; }
+.pnl.active { display:block; }
+
+/* Glass Card */
+.card {
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:12px 14px;
+  margin-bottom:8px;
+}
+
+.card-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+
+.card-title {
+  font-size:var(--font-md);
+  font-weight:600;
+  color:var(--text-bright);
+}
+
+.card-sub {
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+}
+
+/* Info Grid */
+.info-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
+  gap:6px 12px;
+}
+
+.info-item {
+  display:flex;
+  flex-direction:column;
+}
+
+.info-label {
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.info-value {
+  font-size:var(--font-md);
+  color:var(--text);
+}
+
+/* Item List */
+.item-list {
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.item-chip {
+  background:var(--glass-hover);
+  border:1px solid var(--glass-border);
+  border-radius:6px;
+  padding:3px 8px;
+  font-size:var(--font-xs);
+  color:var(--text);
+}
+
+/* Transaction list */
+.tx-list {
+  max-height:200px;
+  overflow-y:auto;
+}
+
+.tx-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:var(--font-xs);
+}
+
+.tx-row:last-child { border-bottom:none; }
+
+.tx-date { color:var(--text-dim); width:70px; flex-shrink:0; }
+.tx-cat { color:var(--text-dim); width:60px; flex-shrink:0; text-align:center; }
+.tx-amount { font-weight:600; width:70px; flex-shrink:0; text-align:right; }
+.tx-amount.income { color:var(--success); }
+.tx-amount.expense { color:var(--danger); }
+.tx-note { color:var(--text-dim); flex:1; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Time display */
+.time-display {
+  text-align:center;
+  padding:20px 10px;
+}
+
+.time-clock {
+  font-size:var(--font-2xl);
+  font-weight:200;
+  color:var(--text-bright);
+  letter-spacing:3px;
+}
+
+.time-date {
+  font-size:var(--font-lg);
+  color:var(--text);
+  margin-top:4px;
+}
+
+.time-weekday {
+  font-size:var(--font-md);
+  color:var(--accent);
+  margin-top:2px;
+}
+
+.time-weather {
+  font-size:var(--font-xl);
+  margin-top:8px;
+}
+
+.time-season {
+  font-size:var(--font-sm);
+  color:var(--text-dim);
+  margin-top:4px;
+}
+
+/* NPC card */
+.npc-card {
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:10px 12px;
+  margin-bottom:6px;
+  cursor:pointer;
+  transition:all .15s;
+}
+
+.npc-card:hover {
+  background:var(--glass-hover);
+  border-color:var(--accent-dim);
+}
+
+.npc-card-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.npc-name {
+  font-size:var(--font-md);
+  font-weight:600;
+  color:var(--text-bright);
+}
+
+.npc-age {
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+}
+
+.npc-meta {
+  display:flex;
+  gap:8px;
+  margin-top:4px;
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+}
+
+.npc-stats {
+  display:flex;
+  gap:12px;
+  margin-top:6px;
+}
+
+.npc-stat {
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+}
+
+.npc-stat-val {
+  color:var(--text);
+  font-weight:600;
+}
+
+/* Progress mini */
+.stat-bar-wrap {
+  width:60px;
+  height:4px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;
+  overflow:hidden;
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:4px;
+}
+
+.stat-bar-fill {
+  height:100%;
+  border-radius:2px;
+  transition:width .4s;
+}
+
+.stat-bar-fill.aff { background:var(--pink); }
+.stat-bar-fill.obed { background:var(--accent); }
+
+/* Modal */
+.mm-modal {
+  display:none;
+  position:absolute;
+  inset:0;
+  background:rgba(15,15,26,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  z-index:300;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.mm-modal.active { display:flex; }
+
+.mm-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 16px;
+  border-bottom:1px solid var(--glass-border);
+  flex-shrink:0;
+}
+
+.mm-title {
+  font-size:var(--font-lg);
+  font-weight:600;
+  color:var(--text-bright);
+}
+
+.mm-close {
+  width:32px;
+  height:32px;
+  border:none;
+  background:var(--glass);
+  color:var(--text);
+  font-size:18px;
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.mm-close:hover { background:var(--glass-hover); }
+
+.mm-body {
+  flex:1;
+  overflow-y:auto;
+  padding:14px 16px;
+}
+
+/* Modal sections */
+.mm-section {
+  margin-bottom:14px;
+}
+
+.mm-section-title {
+  font-size:var(--font-sm);
+  font-weight:600;
+  color:var(--accent);
+  margin-bottom:8px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.mm-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
+  gap:8px;
+}
+
+.mm-field {
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:6px;
+  padding:6px 8px;
+}
+
+.mm-field-label {
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+}
+
+.mm-field-value {
+  font-size:var(--font-md);
+  color:var(--text);
+  margin-top:2px;
+}
+
+/* Body part card */
+.body-part {
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  padding:10px 12px;
+  margin-bottom:6px;
+}
+
+.body-part-name {
+  font-size:var(--font-sm);
+  font-weight:600;
+  color:var(--pink);
+  margin-bottom:6px;
+}
+
+.body-part-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));
+  gap:4px 8px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+
+/* Empty state */
+.empty {
+  text-align:center;
+  padding:30px 20px;
+  color:var(--text-dim);
+  font-size:var(--font-md);
+}
+
+/* Tags */
+.tag {
+  display:inline-block;
+  background:var(--glass-hover);
+  border:1px solid var(--glass-border);
+  border-radius:4px;
+  padding:1px 6px;
+  font-size:var(--font-xs);
+  color:var(--text-dim);
+  margin:1px;
+}
+
+.tag.virgin { color:var(--success); }
+.tag.not-virgin { color:var(--warn); }
+.tag.pregnant { color:var(--danger); }
+
+/* Phase badge */
+.phase-badge {
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:4px;
+  font-size:var(--font-xs);
+  font-weight:600;
+}
+
+.phase-badge.safe { background:rgba(52,211,153,0.2); color:var(--success); }
+.phase-badge.fertile { background:rgba(251,191,36,0.2); color:var(--warn); }
+.phase-badge.period { background:rgba(248,113,113,0.2); color:var(--danger); }
+
+/* Asset card */
+.asset-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+
+.asset-row:last-child { border-bottom:none; }
+
+.asset-name { font-size:var(--font-md); color:var(--text); }
+.asset-amount { font-size:var(--font-lg); font-weight:600; color:var(--text-bright); }
+
+/* Relationship entry */
+.rel-entry {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:var(--font-sm);
+}
+
+.rel-entry:last-child { border-bottom:none; }
+.rel-name { color:var(--text-bright); font-weight:600; }
+.rel-detail { color:var(--text-dim); text-align:right; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="tab-bar">
+    <button class="tab active" data-t="profile"><span>&#x1F464;</span> 人物</button>
+    <button class="tab" data-t="finance"><span>&#x1F4B0;</span> 财务</button>
+    <button class="tab" data-t="time"><span>&#x1F550;</span> 时间</button>
+    <button class="tab" data-t="relations"><span>&#x1F495;</span> 关系</button>
+  </div>
+
+  <div class="pnl active" id="p-profile"></div>
+  <div class="pnl" id="p-finance"></div>
+  <div class="pnl" id="p-time"></div>
+  <div class="pnl" id="p-relations"></div>
+
+  <div class="mm-modal" id="detail-modal">
+    <div class="mm-head">
+      <span class="mm-title" id="modal-title"></span>
+      <button class="mm-close" id="modal-close">&times;</button>
+    </div>
+    <div class="mm-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var W = {
+    '晴': '\u2600\uFE0F', '多云': '\u26C5', '阴': '\u2601\uFE0F',
+    '雨': '\uD83C\uDF27\uFE0F', '小雨': '\uD83C\uDF26\uFE0F', '大雨': '\uD83C\uDF27\uFE0F',
+    '雪': '\u2744\uFE0F', '小雪': '\uD83C\uDF28\uFE0F', '大雪': '\u2744\uFE0F',
+    '雾': '\uD83C\uDF2B\uFE0F', '霾': '\uD83C\uDF2B\uFE0F'
+  };
+
+  var Phases = {
+    '月经中': { cls: 'period', label: '月经中' },
+    '受孕期': { cls: 'fertile', label: '受孕期' },
+    '安全期': { cls: 'safe', label: '安全期' }
+  };
+
+  function g(obj, path, def) {
+    if (!obj || !path) return def;
+    var keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+    var cur = obj;
+    for (var i = 0; i < keys.length; i++) {
+      if (cur == null) return def;
+      cur = cur[keys[i]];
+    }
+    return cur != null ? cur : def;
+  }
+
+  function safeStr(val, def) {
+    if (val == null || val === '') return def || '-';
+    return String(val);
+  }
+
+  function numStr(val, def) {
+    var n = Number(val);
+    return isNaN(n) ? (def != null ? def : '0') : String(n);
+  }
+
+  function barHtml(val, max, cls) {
+    var pct = Math.min(100, Math.max(0, (Number(val)||0) / (Number(max)||1) * 100));
+    return '<span class="stat-bar-wrap"><span class="stat-bar-fill ' + (cls||'') + '" style="width:' + pct + '%"></span></span>' + Math.round(pct);
+  }
+
+  function phaseBadge(phase) {
+    var p = Phases[phase];
+    if (!p) return safeStr(phase);
+    return '<span class="phase-badge ' + p.cls + '">' + p.label + '</span>';
+  }
+
+  async function readGameData() {
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
+        var d = Mvu.getMvuData({ type: 'message', message_id: 'latest' });
+        if (d && d.stat_data) return d.stat_data;
+      }
+    } catch(e) {}
+    try {
+      if (typeof getVariables === 'function') {
+        var v = getVariables({ type: 'message', message_id: 'latest' });
+        if (v && v.stat_data) return v.stat_data;
+      }
+    } catch(e) {}
+    return {};
+  }
+
+  function renderProfile(sd) {
+    var p = sd.profile || {};
+    var bg = p.background || {};
+    var st = p.status || {};
+    var app = p.appearance || {};
+    var inv = p.inventory || [];
+    var rels = p.relationships || {};
+    var rKeys = Object.keys(rels);
+
+    var html = '';
+
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + safeStr(p.name) + '</span><span class="card-sub">' + safeStr(p.occupation) + '</span></div>';
+    html += '<div class="info-grid">';
+    html += '<div class="info-item"><span class="info-label">性别</span><span class="info-value">' + safeStr(p.gender) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">年龄</span><span class="info-value">' + numStr(p.age) + '岁</span></div>';
+    html += '<div class="info-item"><span class="info-label">出生</span><span class="info-value">' + numStr(p.birth_year) + '.' + numStr(p.birth_month) + '.' + numStr(p.birth_day) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">外貌</span><span class="info-value">' + safeStr(app.build) + (app.full ? ', ' + safeStr(app.full) : '') + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">身体状态</span><span class="info-value">' + safeStr(st.physical) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">精神状态</span><span class="info-value">' + safeStr(st.mental) + '</span></div>';
+    html += '</div>';
+
+    if (p.personality) {
+      html += '<div style="margin-top:8px;"><span class="info-label">性格</span><div style="font-size:var(--font-xs);color:var(--text-dim);margin-top:2px;line-height:1.6;">' + safeStr(p.personality).replace(/\n/g, '<br>') + '</div></div>';
+    }
+
+    html += '</div>';
+
+    html += '<div class="card">';
+    html += '<div class="card-title" style="margin-bottom:6px;">背景</div>';
+    html += '<div class="info-grid">';
+    html += '<div class="info-item"><span class="info-label">家乡</span><span class="info-value">' + safeStr(bg.hometown) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">教育</span><span class="info-value">' + safeStr(bg.education) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">居住</span><span class="info-value">' + safeStr(bg.living) + '</span></div>';
+    html += '<div class="info-item"><span class="info-label">求职</span><span class="info-value">' + safeStr(bg.job_status) + '</span></div>';
+    html += '</div></div>';
+
+    html += '<div class="card">';
+    html += '<div class="card-title" style="margin-bottom:6px;">随身物品</div>';
+    if (inv.length) {
+      html += '<div class="item-list">';
+      for (var i = 0; i < inv.length; i++) {
+        html += '<span class="item-chip">' + safeStr(inv[i].name) + (inv[i].desc ? ' (' + safeStr(inv[i].desc) + ')' : '') + '</span>';
+      }
+      html += '</div>';
+    } else {
+      html += '<span class="info-label">暂无</span>';
+    }
+    html += '</div>';
+
+    if (rKeys.length) {
+      html += '<div class="card">';
+      html += '<div class="card-title" style="margin-bottom:6px;">人际关系 (' + rKeys.length + ')</div>';
+      for (var ri = 0; ri < rKeys.length; ri++) {
+        var rel = rels[rKeys[ri]];
+        html += '<div class="rel-entry"><span class="rel-name">' + safeStr(rel.name) + '</span><span class="rel-detail">' + safeStr(rel.relation) + ' - ' + safeStr(rel.status) + '</span></div>';
+      }
+      html += '</div>';
+    }
+
+    return html;
+  }
+
+  function renderFinance(sd) {
+    var f = sd.finance || {};
+    var assets = f.assets || {};
+    var txs = f.transactions || [];
+    var aKeys = Object.keys(assets);
+
+    var html = '';
+
+    html += '<div class="card">';
+    html += '<div class="card-title" style="margin-bottom:8px;">资产</div>';
+    if (aKeys.length) {
+      for (var i = 0; i < aKeys.length; i++) {
+        html += '<div class="asset-row"><span class="asset-name">' + safeStr(aKeys[i]) + '</span><span class="asset-amount">' + numStr(assets[aKeys[i]], '0') + ' 元</span></div>';
+      }
+    } else {
+      html += '<span class="info-label">暂无资产记录</span>';
+    }
+    html += '</div>';
+
+    if (txs.length) {
+      html += '<div class="card">';
+      html += '<div class="card-title" style="margin-bottom:6px;">最近收支</div>';
+      html += '<div class="tx-list">';
+      var start = Math.max(0, txs.length - 10);
+      for (var ti = start; ti < txs.length; ti++) {
+        var tx = txs[ti];
+        var isIncome = tx.type === '收入';
+        html += '<div class="tx-row">';
+        html += '<span class="tx-date">' + safeStr(tx.date) + '</span>';
+        html += '<span class="tx-cat">' + safeStr(tx.category) + '</span>';
+        html += '<span class="tx-amount ' + (isIncome ? 'income' : 'expense') + '">' + (isIncome ? '+' : '') + numStr(tx.amount, '0') + '</span>';
+        html += '<span class="tx-note" title="' + safeStr(tx.note) + '">' + safeStr(tx.note) + '</span>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+
+    return html;
+  }
+
+  function renderTime(sd) {
+    var t = sd.time || {};
+    var html = '';
+
+    html += '<div class="card time-display">';
+    html += '<div class="time-clock">' + String(t.hour||0).padStart(2,'0') + ':' + String(t.minute||0).padStart(2,'0') + '</div>';
+    html += '<div class="time-date">' + numStr(t.year) + '年' + numStr(t.month) + '月' + numStr(t.day) + '日</div>';
+    html += '<div class="time-weekday">' + safeStr(t.weekday) + '</div>';
+    html += '<div class="time-weather">' + (W[t.weather] || '') + ' ' + safeStr(t.weather) + '</div>';
+    html += '<div class="time-season">' + safeStr(t.season) + '</div>';
+    html += '</div>';
+
+    return html;
+  }
+
+  function renderRelations(sd) {
+    var sexual = sd.sexual || {};
+    var male = sd.npc_male || {};
+    var sKeys = Object.keys(sexual);
+    var mKeys = Object.keys(male);
+
+    var html = '';
+
+    if (sKeys.length) {
+      for (var i = 0; i < sKeys.length; i++) {
+        var uid = sKeys[i];
+        var sn = sexual[uid];
+        var phase = g(sn, 'menstrual.current_phase', '安全期');
+        html += '<div class="npc-card" data-uid="' + uid + '">';
+        html += '<div class="npc-card-header">';
+        html += '<span class="npc-name">' + safeStr(sn.name) + '</span>';
+        html += '<span class="npc-age">' + numStr(sn.age) + '岁</span>';
+        html += '</div>';
+        if (sn.outfit) {
+          html += '<div class="npc-meta">' + safeStr(sn.outfit) + '</div>';
+        }
+        html += '<div class="npc-stats">';
+        html += '<span class="npc-stat">好感 ' + barHtml(sn.affection, 100, 'aff') + '</span>';
+        html += '<span class="npc-stat">服从 ' + barHtml(sn.obedience, 100, 'obed') + '</span>';
+        html += '<span class="npc-stat">' + phaseBadge(phase) + '</span>';
+        html += '</div>';
+        html += '<div class="npc-meta">';
+        html += sn.is_virgin ? '<span class="tag virgin">处</span>' : '<span class="tag not-virgin">非处</span>';
+        if (g(sn, 'uterus.pregnancy')) {
+          html += '<span class="tag pregnant">孕</span>';
+        }
+        html += '</div>';
+        html += '</div>';
+      }
+    }
+
+    if (mKeys.length) {
+      html += '<div style="margin-top:12px;"><div class="card-title" style="margin-bottom:8px;color:var(--text-dim);font-size:var(--font-xs);text-transform:uppercase;letter-spacing:1px;">男性 NPC</div></div>';
+      for (var mi = 0; mi < mKeys.length; mi++) {
+        var muid = mKeys[mi];
+        var mn = male[muid];
+        html += '<div class="card">';
+        html += '<div class="card-header"><span class="card-title">' + safeStr(mn.name) + '</span><span class="card-sub">' + numStr(mn.age) + '岁</span></div>';
+        html += '<div class="info-grid">';
+        html += '<div class="info-item"><span class="info-label">职业</span><span class="info-value">' + safeStr(mn.occupation) + '</span></div>';
+        html += '<div class="info-item"><span class="info-label">关系</span><span class="info-value">' + safeStr(mn.social_status) + '</span></div>';
+        html += '</div></div>';
+      }
+    }
+
+    if (!sKeys.length && !mKeys.length) {
+      html += '<div class="empty">暂无 NPC</div>';
+    }
+
+    return html;
+  }
+
+  function renderModalBody(sn) {
+    var bp = sn.body_parts || {};
+    var br = bp.breasts || {};
+    var nip = bp.nipples || {};
+    var vag = bp.vagina || {};
+    var ut = bp.uterus || {};
+    var an = bp.anus || {};
+    var mnst = sn.menstrual || {};
+    var exp = sn.experience || {};
+
+    var h = '';
+
+    h += '<div class="mm-section">';
+    h += '<div class="mm-section-title">基本信息</div>';
+    h += '<div class="mm-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">姓名</div><div class="mm-field-value">' + safeStr(sn.name) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">年龄</div><div class="mm-field-value">' + numStr(sn.age) + '岁</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">出生</div><div class="mm-field-value">' + numStr(sn.birth_year) + '.' + numStr(sn.birth_month) + '.' + numStr(sn.birth_day) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">处女</div><div class="mm-field-value">' + (sn.is_virgin ? '是' : '否') + '</div></div>';
+    if (!sn.is_virgin && sn.first_partner) {
+      h += '<div class="mm-field"><div class="mm-field-label">初夜对象</div><div class="mm-field-value">' + safeStr(sn.first_partner) + '</div></div>';
+    }
+    h += '<div class="mm-field"><div class="mm-field-label">好感</div><div class="mm-field-value">' + barHtml(sn.affection, 100, 'aff') + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">服从</div><div class="mm-field-value">' + barHtml(sn.obedience, 100, 'obed') + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="mm-section">';
+    h += '<div class="mm-section-title">外貌与穿着</div>';
+    h += '<div class="mm-field"><div class="mm-field-label">外貌</div><div class="mm-field-value">' + safeStr(sn.appearance) + '</div></div>';
+    h += '<div class="mm-field" style="margin-top:4px;"><div class="mm-field-label">穿着</div><div class="mm-field-value">' + safeStr(sn.outfit) + '</div></div>';
+    h += '</div>';
+
+    if (sn.personality) {
+      h += '<div class="mm-section">';
+      h += '<div class="mm-section-title">性格</div>';
+      h += '<div style="font-size:var(--font-sm);color:var(--text-dim);line-height:1.7;">' + safeStr(sn.personality).replace(/\n/g, '<br>') + '</div>';
+      h += '</div>';
+    }
+
+    h += '<div class="mm-section">';
+    h += '<div class="mm-section-title">月经周期</div>';
+    h += '<div class="mm-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">周期</div><div class="mm-field-value">' + numStr(mnst.cycle_length, '28') + '天</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">经期</div><div class="mm-field-value">' + numStr(mnst.period_duration, '5') + '天</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">上次月经</div><div class="mm-field-value">' + safeStr(mnst.last_period_date) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">当前状态</div><div class="mm-field-value">' + phaseBadge(mnst.current_phase) + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="mm-section">';
+    h += '<div class="mm-section-title">性经验</div>';
+    h += '<div class="mm-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">总计</div><div class="mm-field-value">' + numStr(exp.total) + '次</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">口交</div><div class="mm-field-value">' + numStr(exp.oral) + '次</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">插入</div><div class="mm-field-value">' + numStr(exp.vaginal) + '次</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">肛交</div><div class="mm-field-value">' + numStr(exp.anal) + '次</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">高潮</div><div class="mm-field-value">' + numStr(sn.orgasm_count) + '次</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="mm-section">';
+    h += '<div class="mm-section-title">身体部位</div>';
+
+    h += '<div class="body-part">';
+    h += '<div class="body-part-name">胸部</div>';
+    h += '<div class="body-part-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">大小</div><div class="mm-field-value">' + safeStr(br.size) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">形状</div><div class="mm-field-value">' + safeStr(br.shape) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">颜色</div><div class="mm-field-value">' + safeStr(br.color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">敏感度</div><div class="mm-field-value">' + safeStr(br.sensitivity) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">状态</div><div class="mm-field-value">' + safeStr(br.status) + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="body-part">';
+    h += '<div class="body-part-name">乳头</div>';
+    h += '<div class="body-part-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">形状</div><div class="mm-field-value">' + safeStr(nip.shape) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">颜色</div><div class="mm-field-value">' + safeStr(nip.color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">乳晕色</div><div class="mm-field-value">' + safeStr(nip.areola_color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">乳晕大小</div><div class="mm-field-value">' + safeStr(nip.areola_size) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">敏感度</div><div class="mm-field-value">' + safeStr(nip.sensitivity) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">状态</div><div class="mm-field-value">' + safeStr(nip.status) + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="body-part">';
+    h += '<div class="body-part-name">小穴</div>';
+    h += '<div class="body-part-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">形状</div><div class="mm-field-value">' + safeStr(vag.shape) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">外阴色</div><div class="mm-field-value">' + safeStr(vag.color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">内壁色</div><div class="mm-field-value">' + safeStr(vag.inner_color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">松紧</div><div class="mm-field-value">' + safeStr(vag.tightness) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">湿润</div><div class="mm-field-value">' + safeStr(vag.wetness) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">敏感度</div><div class="mm-field-value">' + safeStr(vag.sensitivity) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">状态</div><div class="mm-field-value">' + safeStr(vag.status) + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="body-part">';
+    h += '<div class="body-part-name">子宫</div>';
+    h += '<div class="body-part-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">正常</div><div class="mm-field-value">' + (ut.is_normal ? '是' : '异常') + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">怀孕</div><div class="mm-field-value">' + (ut.pregnancy ? safeStr(ut.pregnancy) : '无') + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">敏感度</div><div class="mm-field-value">' + safeStr(ut.sensitivity) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">状态</div><div class="mm-field-value">' + safeStr(ut.status) + '</div></div>';
+    h += '</div></div>';
+
+    h += '<div class="body-part">';
+    h += '<div class="body-part-name">肛门</div>';
+    h += '<div class="body-part-grid">';
+    h += '<div class="mm-field"><div class="mm-field-label">形状</div><div class="mm-field-value">' + safeStr(an.shape) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">颜色</div><div class="mm-field-value">' + safeStr(an.color) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">松紧</div><div class="mm-field-value">' + safeStr(an.tightness) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">敏感度</div><div class="mm-field-value">' + safeStr(an.sensitivity) + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">开发</div><div class="mm-field-value">' + (an.is_developed ? '是' : '未') + '</div></div>';
+    h += '<div class="mm-field"><div class="mm-field-label">状态</div><div class="mm-field-value">' + safeStr(an.status) + '</div></div>';
+    h += '</div></div>';
+
+    h += '</div>';
+
+    var fetishes = sn.fetishes || [];
+    if (fetishes.length) {
+      h += '<div class="mm-section">';
+      h += '<div class="mm-section-title">性癖 (' + fetishes.length + ')</div>';
+      h += '<div>';
+      for (var fi = 0; fi < fetishes.length; fi++) {
+        h += '<span class="tag">' + safeStr(fetishes[fi]) + '</span>';
+      }
+      h += '</div></div>';
+    }
+
+    return h;
+  }
+
+  var curData = {};
+  var isRefreshing = false;
+
+  async function refresh() {
+    if (isRefreshing) return;
+    isRefreshing = true;
+    try {
+      curData = await readGameData();
+      var sd = curData;
+      document.getElementById('p-profile').innerHTML = renderProfile(sd) || '<div class="empty">暂无数据</div>';
+      document.getElementById('p-finance').innerHTML = renderFinance(sd) || '<div class="empty">暂无数据</div>';
+      document.getElementById('p-time').innerHTML = renderTime(sd) || '<div class="empty">暂无数据</div>';
+      document.getElementById('p-relations').innerHTML = renderRelations(sd) || '<div class="empty">暂无数据</div>';
+      bindNpcClicks();
+    } catch(e) {
+      console.error('StatusBar refresh error:', e);
+    }
+    isRefreshing = false;
+  }
+
+  function bindNpcClicks() {
+    var cards = document.querySelectorAll('#p-relations .npc-card');
+    cards.forEach(function(card) {
+      card.addEventListener('click', function() {
+        var uid = card.getAttribute('data-uid');
+        var sn = g(curData, 'sexual.' + uid);
+        if (sn) {
+          document.getElementById('modal-title').textContent = safeStr(sn.name) + ' - 详情';
+          document.getElementById('modal-body').innerHTML = renderModalBody(sn);
+          document.getElementById('detail-modal').classList.add('active');
+        }
+      });
+    });
+  }
+
+  function closeModalFn() {
+    document.getElementById('detail-modal').classList.remove('active');
+  }
+
+  async function init() {
+    // Wait for MVU
+    try {
+      if (typeof waitGlobalInitialized === 'function') {
+        await waitGlobalInitialized('Mvu');
+      }
+    } catch(e) {}
+
+    // Wait for data
+    try {
+      if (typeof waitUntil === 'function') {
+        await waitUntil(async function() {
+          var d = await readGameData();
+          return d && Object.keys(d).length > 0;
+        }, { timeout: 10000, intervalBetweenAttempts: 200 });
+      }
+    } catch(e) {}
+
+    await refresh();
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.pnl').forEach(function(p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        var target = document.getElementById('p-' + tab.getAttribute('data-t'));
+        if (target) target.classList.add('active');
+      });
+    });
+
+    // Modal close
+    document.getElementById('modal-close').addEventListener('click', closeModalFn);
+    document.getElementById('detail-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModalFn();
+    });
+
+    // Event-based refresh
+    try {
+      if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined') {
+        var refreshTimer = null;
+        eventOn(tavern_events.MESSAGE_UPDATED, function() {
+          if (refreshTimer) clearTimeout(refreshTimer);
+          refreshTimer = setTimeout(refresh, 300);
+        });
+        eventOn(tavern_events.MESSAGE_RECEIVED, function() {
+          setTimeout(refresh, 1000);
+        });
+      }
+    } catch(e) {}
+
+    // Fallback polling
+    setInterval(function() {
+      if (!isRefreshing) refresh();
+    }, 3000);
+  }
+
+  // Start
+  if (typeof $ !== 'undefined') {
+    $(function() { init(); });
+  } else if (document.readyState === 'complete') {
+    init();
+  } else {
+    window.addEventListener('load', init);
+  }
+})();
+</script>
+</body>
+</html>

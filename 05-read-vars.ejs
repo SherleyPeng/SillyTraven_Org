@@ -1,0 +1,69 @@
+<%
+if (typeof stat === 'undefined') var stat = getvar('stat_data');
+if (!stat) { %>[暂无变量数据]<% } else {
+var t = stat.time || {};
+var p = stat.profile || {};
+var f = stat.finance || {};
+var s = stat.sexual || {};
+var m = stat.npc_male || {};
+var r = p.relationships || {};
+var assets = f.assets || {};
+var txs = f.transactions || [];
+var rKeys = Object.keys(r);
+var mKeys = Object.keys(m);
+var sKeys = Object.keys(s);
+var aKeys = Object.keys(assets);
+%>
+当前时间: <%- t.year %>年<%- t.month %>月<%- t.day %>日 <%- t.weekday %> <%- String(t.hour).padStart(2,'0') %>:<%- String(t.minute).padStart(2,'0') %>    天气: <%- t.weather %>    季节: <%- t.season %>
+
+用户档案  姓名: <%- p.name %>  年龄: <%- p.age %>岁  出生: <%- p.birth_year %>.<%- p.birth_month %>.<%- p.birth_day %>  性别: <%- p.gender %>  职业: <%- p.occupation %>
+  外貌: <%- p.appearance.build || '' %><% if (p.appearance.full) { %>; <%- p.appearance.full %><% } %>
+  状态: 身体[<%- p.status.physical || '' %>] 精神[<%- p.status.mental || '' %>]
+  性格: <%- p.personality || '未详述' %>
+  背景: <%- p.background.hometown || '' %> | <%- p.background.education || '' %> | <%- p.background.living || '' %> | <%- p.background.job_status || '' %>
+
+随身物品:
+<% if (p.inventory && p.inventory.length) { for (var i=0; i<p.inventory.length; i++) { var item = p.inventory[i]; %>
+  <%- item.name %><% if (item.desc) { %> (<%- item.desc %>)<% } %>
+<% } } else { %>  (无)<% } %>
+
+财务
+<% if (aKeys.length) { for (var ai=0; ai<aKeys.length; ai++) { %>
+  <%- aKeys[ai] %>: <%- assets[aKeys[ai]] %>元
+<% } } else { %>  (无资产记录)<% } %>
+<% if (txs.length) { %>
+  最近收支 (<%- Math.min(txs.length, 10) %>条):
+<% for (var ti=Math.max(0, txs.length-10); ti<txs.length; ti++) { var tx = txs[ti]; %>
+  <%- tx.date %> <%- tx.type %> <%- tx.amount %>元 [<%- tx.account %>] <%- tx.category %><% if (tx.note) { %> "<%- tx.note %>"<% } %>
+<% } } %>
+
+人际关系 (<%- rKeys.length %>人)
+<% if (rKeys.length) { for (var ri=0; ri<rKeys.length; ri++) { var rel = r[rKeys[ri]]; %>
+  [<%- rKeys[ri] %>] <%- rel.name %>  关系: <%- rel.relation %>  状态: <%- rel.status %><% if (rel.notes) { %>  备注: <%- rel.notes %><% } %>
+<% } } else { %>  (暂无)<% } %>
+
+男性NPC (<%- mKeys.length %>人)
+<% if (mKeys.length) { for (var mi=0; mi<mKeys.length; mi++) { var mn = m[mKeys[mi]]; %>
+  [<%- mKeys[mi] %>] <%- mn.name %>  <%- mn.age %>岁  <%- mn.occupation %>  <%- mn.social_status %>
+<% } } else { %>  (暂无)<% } %>
+
+女性NPC (<%- sKeys.length %>人)
+<% if (sKeys.length) { for (var si=0; si<sKeys.length; si++) { var sn = s[sKeys[si]]; var bp = sn.body_parts || {}; var br = bp.breasts || {}; var nip = bp.nipples || {}; var vag = bp.vagina || {}; var ut = bp.uterus || {}; var an = bp.anus || {}; var mnst = sn.menstrual || {}; var exp = sn.experience || {}; %>
+  [<%- sKeys[si] %>] <%- sn.name %>  <%- sn.age %>岁  <%- sn.birth_year %>.<%- sn.birth_month %>.<%- sn.birth_day %>
+  外貌: <%- sn.appearance || '?' %>
+  穿着: <%- sn.outfit || '?' %>
+  性格: <%- sn.personality || '?' %>
+  处女: <%- sn.is_virgin ? '是' : '否(初夜:'+(sn.first_partner||'?')+')' %>
+  好感: <%- sn.affection %>  服从: <%- sn.obedience %>
+  月经: <%- mnst.current_phase || '?' %> (周期<%- mnst.cycle_length||28 %>天/经期<%- mnst.period_duration||5 %>天/上次<%- mnst.last_period_date||'?' %>)
+  性经验: 总计<%- exp.total||0 %> 口<%- exp.oral||0 %> 阴<%- exp.vaginal||0 %> 肛<%- exp.anal||0 %>  高潮: <%- sn.orgasm_count||0 %>
+  部位:
+    胸: <%- br.size||'?' %> <%- br.shape||'?' %> 色<%- br.color||'?' %> 敏<%- br.sensitivity||'?' %> <%- br.status||'?' %>
+    乳头: <%- nip.shape||'?' %> 色<%- nip.color||'?' %> 晕<%- nip.areola_color||'?' %>(<%- nip.areola_size||'?' %>) 敏<%- nip.sensitivity||'?' %> <%- nip.status||'?' %>
+    小穴: <%- vag.shape||'?' %> 色<%- vag.color||'?' %> 内色<%- vag.inner_color||'?' %> 紧<%- vag.tightness||'?' %> 湿<%- vag.wetness||'?' %> 敏<%- vag.sensitivity||'?' %> <%- vag.status||'?' %>
+    子宫: <%- ut.is_normal ? '正常' : '异常' %><% if (ut.pregnancy) { %> 孕[<%- ut.pregnancy %>]<% } %> 敏<%- ut.sensitivity||'?' %> <%- ut.status||'?' %>
+    肛门: <%- an.is_developed ? '已开发' : '未开发' %> 色<%- an.color||'?' %> 紧<%- an.tightness||'?' %> 敏<%- an.sensitivity||'?' %> <%- an.status||'?' %>
+  性癖: <%- (sn.fetishes||[]).join(',') || '(无)' %>
+<% } } else { %>  (暂无)<% } %>
+
+<% } %>

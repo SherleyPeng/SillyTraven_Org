@@ -1,0 +1,10 @@
+{
+  "scriptName": "对AI隐藏状态栏占位符",
+  "findRegex": "/<StatusBar\\/>/gm",
+  "replaceString": "",
+  "placement": [2],
+  "markdownOnly": false,
+  "promptOnly": true,
+  "disabled": false,
+  "runOnEdit": true
+}
