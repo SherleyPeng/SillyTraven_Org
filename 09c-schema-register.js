@@ -194,12 +194,27 @@ const WeiboPostSchema = z.object({
   source:   str()
 }).default({}).catch({});
 
+const ConnectionSchema = z.object({
+  id: str(),
+  from: str(),
+  to: str(),
+  relation: str()
+}).default({}).catch({});
+
+const CalendarEventSchema = z.object({
+  date: str(),
+  title: str(),
+  type: str()
+}).default({}).catch({});
+
 const Schema = z.object({
   time:    TimeSchema,
   profile: ProfileSchema,
   finance: FinanceSchema,
   sexual:   z.object({}).catchall(FemaleNPCSchema).default({}).catch({}),
   npc_male: z.object({}).catchall(MaleNPCSchema).default({}).catch({}),
+  connections: z.array(ConnectionSchema).default([]).catch([]),
+  calendar_events: z.array(CalendarEventSchema).default([]).catch([]),
   wechat:   z.object({}).catchall(WeChatContactSchema).default({}).catch({}),
   weibo:    z.object({
     posts: z.array(WeiboPostSchema).default([]).catch([])

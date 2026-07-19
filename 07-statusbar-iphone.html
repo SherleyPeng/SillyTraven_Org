@@ -1,405 +1,176 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>StatusBar</title>
 <style>
-:root{
-  --bg:#f2f2f7;--fg:#fff;--glass:rgba(255,255,255,0.72);--glass2:rgba(255,255,255,0.55);
-  --glass3:rgba(255,255,255,0.35);--border:rgba(0,0,0,0.06);--border2:rgba(0,0,0,0.10);
-  --text:#1c1c1e;--dim:#8e8e93;--dimmer:#aeaeb2;--bright:#000;
-  --blue:#007aff;--green:#34c759;--red:#ff3b30;--orange:#ff9500;
-  --pink:#ff2d55;--purple:#af52de;--teal:#5ac8fa;--yellow:#ffcc00;
-  --r:14px;--rs:10px;--rx:8px;
-}
+:root{--bg:#f2f2f7;--fg:#fff;--glass:rgba(255,255,255,0.72);--glass2:rgba(255,255,255,0.55);--glass3:rgba(255,255,255,0.35);--border:rgba(0,0,0,0.06);--border2:rgba(0,0,0,0.10);--text:#1c1c1e;--dim:#8e8e93;--dimmer:#aeaeb2;--bright:#000;--blue:#007aff;--green:#34c759;--red:#ff3b30;--orange:#ff9500;--pink:#ff2d55;--purple:#af52de;--teal:#5ac8fa;--yellow:#ffcc00;--r:14px;--rs:10px;--rx:8px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:transparent;color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
-  font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
+body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .phone-wrap{position:relative;margin:4px auto;width:390px;height:700px;perspective:900px}
-.phone-body{
-  width:390px;height:700px;border-radius:48px;background:#fafafa;
-  position:relative;overflow:hidden;
-  box-shadow:
-    0 0 0 3px #d1d1d6,
-    0 0 0 5px #e5e5ea,
-    0 0 0 6px #f2f2f7,
-    0 10px 40px rgba(0,0,0,0.18),
-    0 24px 72px rgba(0,0,0,0.10);
-  transform:rotateX(2deg);
-}
-.phone-body::before{
-  content:'';position:absolute;inset:-3px;border-radius:51px;
-  background:linear-gradient(180deg,#c7c7cc 0%,#d1d1d6 30%,#e5e5ea 50%,#d1d1d6 70%,#c7c7cc 100%);
-  z-index:-1;
-}
-.phone-body::after{
-  content:'';position:absolute;left:-8px;top:140px;width:4px;height:36px;
-  background:#c7c7cc;border-radius:2px 0 0 2px;
-  box-shadow:0 48px 0 0 #c7c7cc,0 96px 0 0 #c7c7cc;
-}
-.phone-wrap::before{
-  content:'';position:absolute;right:-8px;top:160px;width:4px;height:60px;
-  background:#c7c7cc;border-radius:0 2px 2px 0;z-index:10;
-}
-/* Notch */
+.phone-body{width:390px;height:700px;border-radius:48px;background:#fafafa;position:relative;overflow:hidden;box-shadow:0 0 0 3px #d1d1d6,0 0 0 5px #e5e5ea,0 0 0 6px #f2f2f7,0 10px 40px rgba(0,0,0,0.18),0 24px 72px rgba(0,0,0,0.10);transform:rotateX(2deg)}
+.phone-body::before{content:'';position:absolute;inset:-3px;border-radius:51px;background:linear-gradient(180deg,#c7c7cc 0%,#d1d1d6 30%,#e5e5ea 50%,#d1d1d6 70%,#c7c7cc 100%);z-index:-1}
+.phone-body::after{content:'';position:absolute;left:-8px;top:140px;width:4px;height:36px;background:#c7c7cc;border-radius:2px 0 0 2px;box-shadow:0 48px 0 0 #c7c7cc,0 96px 0 0 #c7c7cc}
+.phone-wrap::before{content:'';position:absolute;right:-8px;top:160px;width:4px;height:60px;background:#c7c7cc;border-radius:0 2px 2px 0;z-index:10}
 .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:130px;height:32px;background:#000;border-radius:0 0 22px 22px;z-index:100}
 .sb{display:flex;justify-content:space-between;padding:16px 32px 6px;font-size:12px;font-weight:600;color:var(--text);position:relative;z-index:99}
 .sb .t{letter-spacing:.5px}.sb .i{display:flex;gap:5px;align-items:center;font-size:10px;color:var(--dim)}
-
-/* Home - iOS style */
 .home{position:absolute;top:0;left:0;right:0;bottom:0;padding-top:54px;display:flex;flex-direction:column}
 .home-bg{position:absolute;inset:0;background:linear-gradient(180deg,#e8e8ed 0%,#f2f2f7 60%,#fafafa 100%)}
 .hc{position:relative;flex:1;display:flex;flex-direction:column;padding:0 20px}
-/* Date area - top */
-.h-date{margin-top:12px;padding:0 4px}
-.h-date .weekday{font-size:13px;font-weight:500;color:var(--dim)}
-.h-date .date{font-size:28px;font-weight:300;color:var(--bright);letter-spacing:-1px;margin-top:-2px}
-.h-date .weather{font-size:12px;color:var(--dim);margin-top:2px}
-/* Spacer */
+.h-date{margin-top:10px;padding:0 4px}.h-date .weekday{font-size:13px;font-weight:500;color:var(--dim)}.h-date .date{font-size:28px;font-weight:300;color:var(--bright);letter-spacing:-1px;margin-top:-2px}
+.ww{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin:12px 0;display:flex;align-items:center;gap:12px}
+.ww .wi{font-size:32px}.ww .wn{flex:1}.ww .wt{font-size:24px;font-weight:300;color:var(--bright)}.ww .wd{font-size:12px;color:var(--dim)}.ww .we{text-align:right;font-size:10px;color:var(--dimmer);line-height:1.5}
 .h-spacer{flex:1}
-/* App grid - bottom area */
-.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 0;padding:0 6px;margin-bottom:16px}
-.app-icon{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .15s}
-.app-icon:active{transform:scale(.85)}
-.app-icon .ic{width:62px;height:62px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;font-weight:600;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.app-icon .lb{font-size:10px;color:var(--text);text-align:center;letter-spacing:.2px;line-height:1.2}
-.ic-person{background:linear-gradient(135deg,#5856d6,#af52de)}
-.ic-bank{background:linear-gradient(135deg,#30d158,#34c759)}
-.ic-cal{background:linear-gradient(135deg,#ff375f,#ff453a)}
-.ic-cal .day{font-size:24px;font-weight:700;line-height:1}
-.ic-contacts{background:linear-gradient(135deg,#5e5ce6,#8e8e93)}
-.ic-lover{background:linear-gradient(135deg,#ff375f,#ff6482)}
-.ic-wechat{background:linear-gradient(135deg,#07c160,#30d158)}
-.ic-weibo{background:linear-gradient(135deg,#ff6b35,#ff3b30)}
-.ic-kotodama{background:linear-gradient(135deg,#ffd60a,#ff9500)}
-/* Dock */
-.dock-area{padding:0 4px 6px}
-.dock{
-  padding:6px 8px;background:var(--glass);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
-  border-radius:28px;display:flex;justify-content:center;gap:0;border:1px solid var(--border);
-}
-.dock .app-icon .ic{width:50px;height:50px;font-size:20px;border-radius:12px}
-
-/* Page indicator */
-.page-dots{display:flex;justify-content:center;gap:6px;padding:6px 0 4px}
-.page-dots .dot{width:6px;height:6px;border-radius:3px;background:var(--dim)}
-.page-dots .dot.active{background:var(--text);width:18px}
-
-/* App Pages */
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 0;padding:0 6px;margin-bottom:10px}
+.ai{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .15s;position:relative}
+.ai:active{transform:scale(.85)}.ai .ic{width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.08)}.ai .lb{font-size:9px;color:var(--text);text-align:center;line-height:1.2}
+.bdg{position:absolute;top:-3px;right:0;min-width:18px;height:18px;background:var(--red);color:#fff;border-radius:9px;font-size:10px;font-weight:600;display:none;align-items:center;justify-content:center;padding:0 5px;z-index:5;border:2px solid var(--fg)}.bdg.on{display:flex}
+.ic-0{background:linear-gradient(135deg,#5856d6,#af52de)}.ic-1{background:linear-gradient(135deg,#30d158,#34c759)}
+.ic-2{background:linear-gradient(135deg,#ff375f,#ff453a)}.ic-2 .day{font-size:22px;font-weight:700;line-height:1}
+.ic-3{background:linear-gradient(135deg,#5e5ce6,#8e8e93)}.ic-4{background:linear-gradient(135deg,#5ac8fa,#007aff)}
+.ic-5{background:linear-gradient(135deg,#ff375f,#ff6482)}.ic-6{background:linear-gradient(135deg,#07c160,#30d158)}
+.ic-7{background:linear-gradient(135deg,#ff6b35,#ff3b30)}.ic-8{background:linear-gradient(135deg,#ffd60a,#ff9500)}
+.dock-area{padding:0 4px 6px}.dock{padding:6px 8px;background:var(--glass);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-radius:28px;display:flex;justify-content:center;gap:0;border:1px solid var(--border)}.dock .ai .ic{width:48px;height:48px;font-size:18px;border-radius:12px}
+.pdots{display:flex;justify-content:center;gap:6px;padding:4px 0 4px}.pdots .dot{width:6px;height:6px;border-radius:3px;background:var(--dim)}.pdots .dot.on{background:var(--text);width:18px}
 .app-page{position:absolute;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;padding-top:50px}
-.app-page.open{display:flex;animation:fadeIn .25s ease-out}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.an{display:flex;align-items:center;padding:4px 16px;gap:14px;min-height:44px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.an .back{width:28px;height:28px;border-radius:50%;background:var(--glass2);border:1px solid var(--border2);color:var(--blue);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.an .tt{font-size:17px;font-weight:600;color:var(--text)}
-.ab{flex:1;overflow-y:auto;padding:8px 16px 20px;-webkit-overflow-scrolling:touch}
-
-/* Cells */
-.cell{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
-.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.ct{font-size:14px;font-weight:600;color:var(--bright)}
-.cs{font-size:12px;color:var(--dim)}
-.cr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
-.cr:last-child{border-bottom:none}
-.cr .lbl{color:var(--dim)}.cr .val{color:var(--text);font-weight:500}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
-.fd{display:flex;flex-direction:column}.fl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px}.fv{font-size:13px;color:var(--text)}
-
-/* Bank */
-.ar{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
-.ar:not(:last-child){border-bottom:1px solid var(--border)}
-.aname{font-size:14px;color:var(--text)}.aval{font-size:18px;font-weight:600;color:var(--green)}
-.txr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
-.txc{color:var(--dim);width:44px;flex-shrink:0}.txn{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.txd{color:var(--dimmer);width:56px;flex-shrink:0;text-align:right}
-.txa{font-weight:600;width:60px;flex-shrink:0;text-align:right}.txa.in{color:var(--green)}.txa.out{color:var(--red)}
-
-/* Time */
-.td{text-align:center;padding:16px 0}
-.tc{font-size:52px;font-weight:200;color:var(--bright);letter-spacing:3px}
-.tdt{font-size:18px;color:var(--text);margin-top:3px}
-.tw{font-size:16px;color:var(--blue);margin-top:2px}
-.ti{font-size:14px;color:var(--dim);margin-top:6px}
-
-/* NPC */
-.nc{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s}
-.nc:hover{background:rgba(255,255,255,0.9);border-color:var(--border2)}
-.nch{display:flex;justify-content:space-between;align-items:center}.ncn{font-size:14px;font-weight:600;color:var(--bright)}.nca{font-size:11px;color:var(--dim)}
-.ncs{display:flex;gap:12px;margin-top:6px;font-size:11px}.ncst{color:var(--dim)}
-.bw{width:50px;height:3px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}
-.bf{height:100%;border-radius:2px;transition:width .3s}.aff{background:var(--pink)}.obed{background:var(--blue)}
-.badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:500}
-.bs{background:rgba(52,199,89,0.15);color:var(--green)}.bfe{background:rgba(255,149,0,0.15);color:var(--orange)}.bpe{background:rgba(255,59,48,0.15);color:var(--red)}
+.app-page.open{display:flex;animation:fi .25s ease-out}@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.an{display:flex;align-items:center;padding:4px 16px;gap:14px;min-height:44px;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.an .bk{width:28px;height:28px;border-radius:50%;background:var(--glass2);border:1px solid var(--border2);color:var(--blue);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.an .tt{font-size:17px;font-weight:600;color:var(--text)}.ab{flex:1;overflow-y:auto;padding:8px 16px 20px}
+.cell{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.ct{font-size:14px;font-weight:600;color:var(--bright)}.cs{font-size:12px;color:var(--dim)}
+.cr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}.cr:last-child{border-bottom:none}.cr .lbl{color:var(--dim)}.cr .val{color:var(--text);font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}.fd{display:flex;flex-direction:column}.fl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px}.fv{font-size:13px;color:var(--text)}
+.vr{display:flex;align-items:center;gap:8px;padding:3px 0}.vr .vl{font-size:11px;color:var(--dim);width:30px}.vr .vb{flex:1;height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden}.vr .vbf{height:100%;border-radius:3px;transition:width .4s}.vr .vv{font-size:11px;color:var(--text);width:22px;text-align:right}.vbf.p{background:linear-gradient(90deg,var(--green),var(--teal))}.vbf.m{background:linear-gradient(90deg,var(--blue),var(--purple))}.vbf.f{background:linear-gradient(90deg,var(--yellow),var(--orange))}.vbf.h{background:linear-gradient(90deg,var(--orange),var(--red))}.vbf.y{background:linear-gradient(90deg,var(--teal),var(--blue))}
+.ar{display:flex;justify-content:space-between;align-items:center;padding:8px 0}.ar:not(:last-child){border-bottom:1px solid var(--border)}.aname{font-size:14px;color:var(--text)}.aval{font-size:18px;font-weight:600;color:var(--green)}
+.txr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}.txc{color:var(--dim);width:44px}.txn{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txd{color:var(--dimmer);width:56px;text-align:right}.txa{font-weight:600;width:60px;text-align:right}.txa.in{color:var(--green)}.txa.out{color:var(--red)}
+.td{text-align:center;padding:16px 0}.tc{font-size:52px;font-weight:200;color:var(--bright);letter-spacing:3px}.tdt{font-size:18px;color:var(--text);margin-top:3px}.tw{font-size:16px;color:var(--blue);margin-top:2px}.ti{font-size:14px;color:var(--dim);margin-top:6px}
+.nc{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;cursor:pointer}.nc:hover{background:rgba(255,255,255,0.9)}.nch{display:flex;justify-content:space-between}.ncn{font-size:14px;font-weight:600;color:var(--bright)}.nca{font-size:11px;color:var(--dim)}.ncs{display:flex;gap:12px;margin-top:6px;font-size:11px}.ncst{color:var(--dim)}
+.bw{width:50px;height:3px;background:rgba(0,0,0,0.08);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}.bf{height:100%;border-radius:2px}.aff{background:var(--pink)}.obed{background:var(--blue)}
+.badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:500}.bs{background:rgba(52,199,89,0.15);color:var(--green)}.bfe{background:rgba(255,149,0,0.15);color:var(--orange)}.bpe{background:rgba(255,59,48,0.15);color:var(--red)}
 .tag{display:inline-block;background:rgba(0,0,0,0.04);border-radius:5px;padding:2px 7px;font-size:11px;margin:2px}.tg{color:var(--green)}.tnv{color:var(--orange)}.tp{color:var(--red)}
-
-/* WeChat */
-.wxl{display:flex;flex-direction:column;gap:1px}
-.wxc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
-.wxa{width:44px;height:44px;border-radius:8px;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--dim);flex-shrink:0}
-.wxi{flex:1;min-width:0}.wxn{font-size:14px;font-weight:500;color:var(--text)}
-.wxp{font-size:11px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wxt{font-size:10px;color:var(--dimmer);flex-shrink:0}
-.wxchat{display:flex;flex-direction:column;gap:8px;padding:8px 0}
-.wxb{max-width:72%;padding:9px 13px;border-radius:18px;font-size:13px;line-height:1.5;word-break:break-word}
-.wxb.me{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
-.wxb.you{align-self:flex-start;background:#e9e9ed;color:var(--text);border-bottom-left-radius:4px}
-.wxbt{font-size:10px;color:var(--dimmer);align-self:center;margin:3px 0}
-
-/* Weibo */
-.wp{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
-.wph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.wpa{width:30px;height:30px;border-radius:50%;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:14px}
-.wpu{font-size:12px;font-weight:500;color:var(--text)}.wpt{font-size:10px;color:var(--dimmer);margin-left:auto}
-.wpti{font-size:14px;font-weight:600;color:var(--bright);margin-bottom:4px}
-.wpb{font-size:12px;color:var(--dim);line-height:1.6}
-.wcat{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;margin-bottom:6px;font-weight:500}
-.wcat.tech{background:rgba(0,122,255,0.1);color:var(--blue)}.wcat.ent{background:rgba(175,82,222,0.1);color:var(--purple)}
-.wcat.pol{background:rgba(255,149,0,0.1);color:var(--orange)}.wcat.soc{background:rgba(52,199,89,0.1);color:var(--green)}
-
-/* Kotodama */
-.kd-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;position:relative}
-.kd-card.revoked{opacity:0.4;border-color:rgba(255,59,48,0.15)}
-.kd-id{font-size:11px;color:var(--dim);margin-bottom:3px}
-.kd-cmd{font-size:14px;font-weight:600;color:var(--bright);margin-bottom:5px}
-.kd-result{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:4px}
-.kd-time{font-size:10px;color:var(--dimmer)}
-.kd-badge{position:absolute;top:10px;right:12px;font-size:10px;padding:2px 8px;border-radius:5px;font-weight:500}
-.kd-badge.active{background:rgba(52,199,89,0.12);color:var(--green)}
-.kd-badge.revoked{background:rgba(255,59,48,0.12);color:var(--red)}
-.kd-fold{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;cursor:pointer;font-size:12px;color:var(--blue);margin-bottom:8px}.kd-fold:hover{background:var(--glass2)}
-.kd-folded{display:none}
-
-/* Modal */
-.modal{position:absolute;inset:0;z-index:300;background:rgba(242,242,247,0.97);backdrop-filter:blur(40px);display:none;flex-direction:column;padding-top:50px}
-.modal.open{display:flex}
-.mn{display:flex;align-items:center;padding:4px 16px;gap:14px;min-height:44px;background:var(--glass);border-bottom:1px solid var(--border)}
-.mb{flex:1;overflow-y:auto;padding:8px 16px 20px}
-.ms{margin-bottom:14px}.mst{font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}
-.mf{background:var(--glass);border:1px solid var(--border);border-radius:var(--rx);padding:6px 8px}.mfl{font-size:10px;color:var(--dim)}.mfv{font-size:12px;color:var(--text);margin-top:2px}
+.cn{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}.ca{width:32px;height:32px;border-radius:50%;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:14px}.ci{flex:1}.cnm{font-size:13px;font-weight:500;color:var(--text)}.crl{font-size:10px;color:var(--dim)}.car{color:var(--dimmer);font-size:14px;margin:0 4px}
+.wxl{display:flex;flex-direction:column;gap:1px}.wxc{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}.wxa{width:44px;height:44px;border-radius:8px;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--dim)}.wxi{flex:1;min-width:0}.wxn{font-size:14px;font-weight:500;color:var(--text)}.wxp{font-size:11px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wxt{font-size:10px;color:var(--dimmer)}
+.wxchat{display:flex;flex-direction:column;gap:8px;padding:8px 0}.wxb{max-width:72%;padding:9px 13px;border-radius:18px;font-size:13px;line-height:1.5;word-break:break-word}.wxb.me{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}.wxb.you{align-self:flex-start;background:#e9e9ed;color:var(--text);border-bottom-left-radius:4px}.wxbt{font-size:10px;color:var(--dimmer);align-self:center;margin:3px 0}
+.wp{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}.wph{display:flex;align-items:center;gap:8px;margin-bottom:6px}.wpa{width:30px;height:30px;border-radius:50%;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:14px}.wpu{font-size:12px;font-weight:500;color:var(--text)}.wpt{font-size:10px;color:var(--dimmer);margin-left:auto}.wpti{font-size:14px;font-weight:600;color:var(--bright);margin-bottom:4px}.wpb{font-size:12px;color:var(--dim);line-height:1.6}.wcat{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;margin-bottom:6px;font-weight:500}.wcat.tc{background:rgba(0,122,255,0.1);color:var(--blue)}.wcat.en{background:rgba(175,82,222,0.1);color:var(--purple)}.wcat.po{background:rgba(255,149,0,0.1);color:var(--orange)}.wcat.so{background:rgba(52,199,89,0.1);color:var(--green)}
+.kdc{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;position:relative}.kdc.rv{opacity:0.4}.kd-id{font-size:11px;color:var(--dim);margin-bottom:3px}.kd-cmd{font-size:14px;font-weight:600;color:var(--bright);margin-bottom:5px}.kd-res{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:4px}.kd-time{font-size:10px;color:var(--dimmer)}.kd-badge{position:absolute;top:10px;right:12px;font-size:10px;padding:2px 8px;border-radius:5px;font-weight:500}.kd-badge.ac{background:rgba(52,199,89,0.12);color:var(--green)}.kd-badge.rk{background:rgba(255,59,48,0.12);color:var(--red)}
+.kd-fold{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;cursor:pointer;font-size:12px;color:var(--blue);margin-bottom:8px}.kd-fold:hover{background:var(--glass2)}.kd-folded{display:none}
+.evc{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}.evd{font-size:11px;color:var(--blue);font-weight:500;width:38px;text-align:center}.evi{flex:1}.evt{font-size:13px;font-weight:500;color:var(--text)}.evy{font-size:10px;color:var(--dim)}
+.modal{position:absolute;inset:0;z-index:300;background:rgba(242,242,247,0.97);backdrop-filter:blur(40px);display:none;flex-direction:column;padding-top:50px}.modal.open{display:flex}
+.mn{display:flex;align-items:center;padding:4px 16px;gap:14px;min-height:44px;background:var(--glass);border-bottom:1px solid var(--border)}.mb{flex:1;overflow-y:auto;padding:8px 16px 20px}
+.ms{margin-bottom:14px}.mst{font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}.mf{background:var(--glass);border:1px solid var(--border);border-radius:var(--rx);padding:6px 8px}.mfl{font-size:10px;color:var(--dim)}.mfv{font-size:12px;color:var(--text);margin-top:2px}
 .bpt{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:6px}.bpn{font-size:11px;font-weight:600;color:var(--pink);margin-bottom:6px}.bpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:4px 8px}
-.empty{text-align:center;padding:44px 20px;color:var(--dim);font-size:14px}
-.empty .ei{font-size:48px;margin-bottom:12px;opacity:.3}
-
+.empty{text-align:center;padding:44px 20px;color:var(--dim);font-size:14px}.empty .ei{font-size:48px;margin-bottom:12px;opacity:.3}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:2px}
 </style>
 </head>
 <body>
 <div class="phone-wrap"><div class="phone-body">
-
 <div class="notch"></div>
 <div class="sb"><span class="t" id="sb-time">13:00</span><span class="i"><span>●●●●○</span><span>WiFi</span><span>🔋</span></span></div>
-
-<!-- HOME -->
 <div class="home" id="home"><div class="home-bg"></div><div class="hc">
-<!-- Date -->
-<div class="h-date">
-  <div class="weekday" id="h-weekday">星期六</div>
-  <div class="date" id="h-date">12月14日</div>
-  <div class="weather" id="h-weather">晴 · 冬 · 13°</div>
-</div>
+<div class="h-date"><div class="weekday" id="h-weekday">星期六</div><div class="date" id="h-date">12月14日</div></div>
+<div class="ww"><div class="wi" id="ww-icon">☀️</div><div class="wn"><div class="wt" id="ww-temp">晴</div><div class="wd" id="ww-desc">冬</div></div><div class="we"><div>北京</div><div id="ww-aqi">AQI 280</div></div></div>
 <div class="h-spacer"></div>
-<!-- App icons -->
 <div class="app-grid">
-<div class="app-icon" data-app="profile"><div class="ic ic-person">👤</div><div class="lb">人物</div></div>
-<div class="app-icon" data-app="bank"><div class="ic ic-bank">🏦</div><div class="lb">银行</div></div>
-<div class="app-icon" data-app="calendar"><div class="ic ic-cal"><span class="day" id="cal-day">14</span></div><div class="lb">日历</div></div>
-<div class="app-icon" data-app="contacts"><div class="ic ic-contacts">📇</div><div class="lb">联系人</div></div>
-<div class="app-icon" data-app="lover"><div class="ic ic-lover">💕</div><div class="lb">Lover</div></div>
-<div class="app-icon" data-app="wechat"><div class="ic ic-wechat">💬</div><div class="lb">微信</div></div>
-<div class="app-icon" data-app="weibo"><div class="ic ic-weibo">📰</div><div class="lb">微博</div></div>
-<div class="app-icon" data-app="kotodama"><div class="ic ic-kotodama">✨</div><div class="lb">言灵</div></div>
+<div class="ai" data-app="profile"><div class="ic ic-0">👤</div><div class="lb">人物</div><div class="bdg" id="bg-profile"></div></div>
+<div class="ai" data-app="bank"><div class="ic ic-1">🏦</div><div class="lb">银行</div></div>
+<div class="ai" data-app="calendar"><div class="ic ic-2"><span class="day" id="cal-day">14</span></div><div class="lb">日历</div></div>
+<div class="ai" data-app="contacts"><div class="ic ic-3">📇</div><div class="lb">通讯录</div><div class="bdg" id="bg-contacts"></div></div>
+<div class="ai" data-app="connections"><div class="ic ic-4">🕸</div><div class="lb">人脉</div><div class="bdg" id="bg-connections"></div></div>
+<div class="ai" data-app="lover"><div class="ic ic-5">💕</div><div class="lb">Lover</div><div class="bdg" id="bg-lover"></div></div>
+<div class="ai" data-app="wechat"><div class="ic ic-6">💬</div><div class="lb">微信</div><div class="bdg" id="bg-wechat"></div></div>
+<div class="ai" data-app="weibo"><div class="ic ic-7">📰</div><div class="lb">微博</div><div class="bdg" id="bg-weibo"></div></div>
+<div class="ai" data-app="kotodama"><div class="ic ic-8">✨</div><div class="lb">言灵</div><div class="bdg" id="bg-kotodama"></div></div>
 </div>
-<!-- Dock -->
 <div class="dock-area"><div class="dock">
-<div class="app-icon" data-app="wechat"><div class="ic ic-wechat" style="width:46px;height:46px;font-size:18px">💬</div><div class="lb" style="display:none">微信</div></div>
-<div class="app-icon" data-app="lover"><div class="ic ic-lover" style="width:46px;height:46px;font-size:18px">💕</div><div class="lb" style="display:none">Lover</div></div>
+<div class="ai" data-app="wechat"><div class="ic ic-6" style="width:44px;height:44px;font-size:16px;border-radius:10px">💬</div></div>
+<div class="ai" data-app="lover"><div class="ic ic-5" style="width:44px;height:44px;font-size:16px;border-radius:10px">💕</div></div>
 </div></div>
-<div class="page-dots"><div class="dot active"></div><div class="dot"></div></div>
-</div></div>
-
-<!-- PAGES -->
-<div class="app-page" id="app-profile"><div class="an"><button class="back" data-back="home">←</button><span class="tt">人物</span></div><div class="ab" id="body-profile"></div></div>
-<div class="app-page" id="app-bank"><div class="an"><button class="back" data-back="home">←</button><span class="tt">银行</span></div><div class="ab" id="body-bank"></div></div>
-<div class="app-page" id="app-calendar"><div class="an"><button class="back" data-back="home">←</button><span class="tt">日历</span></div><div class="ab" id="body-calendar"></div></div>
-<div class="app-page" id="app-contacts"><div class="an"><button class="back" data-back="home">←</button><span class="tt">联系人</span></div><div class="ab" id="body-contacts"></div></div>
-<div class="app-page" id="app-lover"><div class="an"><button class="back" data-back="home">←</button><span class="tt">Lover</span></div><div class="ab" id="body-lover"></div></div>
-<div class="app-page" id="app-wechat"><div class="an"><button class="back" data-back="home">←</button><span class="tt">微信</span></div><div class="ab" id="body-wechat"></div></div>
-<div class="app-page" id="app-wxchat"><div class="an"><button class="back" data-back="wechat">←</button><span class="tt" id="wxchat-title">聊天</span></div><div class="ab" id="body-wxchat"></div></div>
-<div class="app-page" id="app-weibo"><div class="an"><button class="back" data-back="home">←</button><span class="tt">微博</span></div><div class="ab" id="body-weibo"></div></div>
-<div class="app-page" id="app-kotodama"><div class="an"><button class="back" data-back="home">←</button><span class="tt">言灵</span></div><div class="ab" id="body-kotodama"></div></div>
-
-<!-- Modal -->
-<div class="modal" id="npc-modal"><div class="mn"><button class="back" data-back="lover">←</button><span class="tt" id="npc-modal-title"></span></div><div class="mb" id="npc-modal-body"></div></div>
-
+<div class="pdots"><div class="dot on"></div><div class="dot"></div></div>
 </div></div>
 
+<div class="app-page" id="app-profile"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">人物</span></div><div class="ab" id="body-profile"></div></div>
+<div class="app-page" id="app-bank"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">银行</span></div><div class="ab" id="body-bank"></div></div>
+<div class="app-page" id="app-calendar"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">日历</span></div><div class="ab" id="body-calendar"></div></div>
+<div class="app-page" id="app-contacts"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">通讯录</span></div><div class="ab" id="body-contacts"></div></div>
+<div class="app-page" id="app-connections"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">人脉图谱</span></div><div class="ab" id="body-connections"></div></div>
+<div class="app-page" id="app-lover"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">Lover</span></div><div class="ab" id="body-lover"></div></div>
+<div class="app-page" id="app-wechat"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">微信</span></div><div class="ab" id="body-wechat"></div></div>
+<div class="app-page" id="app-wxchat"><div class="an"><button class="bk" data-back="wechat">←</button><span class="tt" id="wxchat-title">聊天</span></div><div class="ab" id="body-wxchat"></div></div>
+<div class="app-page" id="app-weibo"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">微博</span></div><div class="ab" id="body-weibo"></div></div>
+<div class="app-page" id="app-kotodama"><div class="an"><button class="bk" data-back="home">←</button><span class="tt">言灵</span></div><div class="ab" id="body-kotodama"></div></div>
+<div class="modal" id="npc-modal"><div class="mn"><button class="bk" data-back="lover">←</button><span class="tt" id="npc-modal-title"></span></div><div class="mb" id="npc-modal-body"></div></div>
+</div></div>
 <script>
 (function(){
-var cur={},sig='',lastGood=null,isRefreshing=false,initDone=false,WX_CHAT_CONTACT=null;
-
+var cur={},sig='',lastGood=null,rf=false,initDone=false,WXC=null;
 function G(o,p,d){if(!o||!p)return d;var k=p.replace(/\[(\d+)\]/g,'.$1').split('.'),c=o;for(var i=0;i<k.length;i++){if(c==null)return d;c=c[k[i]];}return c!=null?c:d;}
 function S(v,d){return(v==null||v==='')?(d||'-'):String(v);}
 function N(v,d){var x=Number(v);return isNaN(x)?(d!=null?String(d):'0'):String(x);}
-function B(v,m,c){var p=Math.min(100,Math.max(0,(Number(v)||0)/(Number(m)||1)*100));return'<span class="bw"><span class="bf '+c+'" style="width:'+p+'%"></span></span>'+Math.round(p);}
+function Bb(v,m,c){var p=Math.min(100,Math.max(0,(Number(v)||0)/(Number(m)||1)*100));return'<span class="bw"><span class="bf '+c+'" style="width:'+p+'%"></span></span>'+Math.round(p);}
 function E(v){return S(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
+function FM(v){var n=Number(v);if(isNaN(n)||n===0)return'¥0';if(n>=1e8)return'¥'+(n/1e8).toFixed(1)+'亿';if(n>=1e4)return'¥'+Math.round(n/1e4)+'万';return'¥'+n.toLocaleString('zh-CN');}
 function readData(){
 if(typeof Mvu!=='undefined'&&Mvu.getMvuData){try{var r=Mvu.getMvuData({type:'message',message_id:'latest'});if(r&&r.stat_data&&Object.keys(r.stat_data).length>0)return r.stat_data;}catch(e){}try{var r=Mvu.getMvuData({type:'message',message_id:0});if(r&&r.stat_data&&Object.keys(r.stat_data).length>0)return r.stat_data;}catch(e){}}
 if(typeof getVariables==='function'){try{var v=getVariables({type:'message',message_id:'latest'});if(v&&v.stat_data&&Object.keys(v.stat_data).length>0)return v.stat_data;}catch(e){}try{var v=getVariables({type:'message',message_id:0});if(v&&v.stat_data&&Object.keys(v.stat_data).length>0)return v.stat_data;}catch(e){}}
-return lastGood||{};
-}
-
+return lastGood||{};}
+var WI={'晴':'☀️','多云':'⛅','阴':'☁️','雨':'🌧️','小雨':'🌦️','大雪':'🌨️','雪':'❄️','雾':'🌫️','霾':'🌫️'};
+function rVitals(d){var st=(d.profile||{}).stats||{};
+function bar(l,v,c){return'<div class="vr"><span class="vl">'+l+'</span><div class="vb"><div class="vbf '+c+'" style="width:'+Math.min(100,Math.max(0,Number(v)||0))+'%"></div></div><span class="vv">'+N(v)+'</span></div>';}
+return bar('体力',st.physical||85,'p')+bar('精神',st.mental||72,'m')+bar('疲劳',st.fatigue||20,'f')+bar('饱腹',st.hunger||60,'h')+bar('卫生',st.hygiene||75,'y');}
 function rProfile(d){var p=d.profile||{},bg=p.background||{},st=p.status||{},app=p.appearance||{},inv=p.inventory||[],rels=p.relationships||{};
 var h='<div class="cell"><div class="ch"><span class="ct">'+E(p.name)+'</span><span class="cs">'+E(p.occupation)+'</span></div><div class="grid2">';
-h+='<div class="fd"><span class="fl">性别</span><span class="fv">'+E(p.gender)+'</span></div>';
-h+='<div class="fd"><span class="fl">年龄</span><span class="fv">'+N(p.age)+'岁</span></div>';
-h+='<div class="fd"><span class="fl">出生</span><span class="fv">'+N(p.birth_year)+'.'+N(p.birth_month)+'.'+N(p.birth_day)+'</span></div>';
-h+='<div class="fd"><span class="fl">外貌</span><span class="fv">'+E(app.build)+(app.full?', '+E(app.full):'')+'</span></div>';
-h+='<div class="fd"><span class="fl">身体</span><span class="fv">'+E(st.physical)+'</span></div>';
-h+='<div class="fd"><span class="fl">精神</span><span class="fv">'+E(st.mental)+'</span></div>';
+h+='<div class="fd"><span class="fl">性别</span><span class="fv">'+E(p.gender)+'</span></div>';h+='<div class="fd"><span class="fl">年龄</span><span class="fv">'+N(p.age)+'岁</span></div>';h+='<div class="fd"><span class="fl">出生</span><span class="fv">'+N(p.birth_year)+'.'+N(p.birth_month)+'.'+N(p.birth_day)+'</span></div>';h+='<div class="fd"><span class="fl">外貌</span><span class="fv">'+E(app.build)+(app.full?', '+E(app.full):'')+'</span></div>';h+='<div class="fd"><span class="fl">身体</span><span class="fv">'+E(st.physical)+'</span></div>';h+='<div class="fd"><span class="fl">精神</span><span class="fv">'+E(st.mental)+'</span></div>';
 h+='</div></div>';
-h+='<div class="cell"><div class="ct" style="margin-bottom:8px">背景</div><div class="grid2">';
-h+='<div class="fd"><span class="fl">家乡</span><span class="fv">'+E(bg.hometown)+'</span></div>';
-h+='<div class="fd"><span class="fl">教育</span><span class="fv">'+E(bg.education)+'</span></div>';
-h+='<div class="fd"><span class="fl">居住</span><span class="fv">'+E(bg.living)+'</span></div>';
-h+='<div class="fd"><span class="fl">求职</span><span class="fv">'+E(bg.job_status)+'</span></div>';
-h+='</div></div>';
+h+='<div class="cell"><div class="ct" style="margin-bottom:6px">📊 状态</div>'+rVitals(d)+'</div>';
+h+='<div class="cell"><div class="ct" style="margin-bottom:8px">背景</div><div class="grid2">';h+='<div class="fd"><span class="fl">家乡</span><span class="fv">'+E(bg.hometown)+'</span></div>';h+='<div class="fd"><span class="fl">教育</span><span class="fv">'+E(bg.education)+'</span></div>';h+='<div class="fd"><span class="fl">居住</span><span class="fv">'+E(bg.living)+'</span></div>';h+='<div class="fd"><span class="fl">求职</span><span class="fv">'+E(bg.job_status)+'</span></div>';h+='</div></div>';
 if(p.personality)h+='<div class="cell"><div class="ct" style="margin-bottom:4px">性格</div><div style="font-size:12px;color:var(--dim);line-height:1.7">'+E(p.personality).replace(/\n/g,'<br>')+'</div></div>';
 if(inv.length){h+='<div class="cell"><div class="ct" style="margin-bottom:8px">物品</div>';for(var i=0;i<inv.length;i++)h+='<span class="tag">'+E(inv[i].name)+(inv[i].desc?'('+E(inv[i].desc)+')':'')+'</span>';h+='</div>';}
 var rk=Object.keys(rels);if(rk.length){h+='<div class="cell"><div class="ct" style="margin-bottom:8px">亲密关系</div>';for(var ri=0;ri<rk.length;ri++){var r=rels[rk[ri]];h+='<div class="cr"><span class="lbl">'+E(r.name)+'</span><span class="val">'+E(r.relation)+' - '+E(r.status)+'</span></div>';}h+='</div>';}
 return h;}
-
 function rBank(d){var f=d.finance||{},a=f.assets||{},tx=f.transactions||[],ak=Object.keys(a);
-var h='<div class="cell"><div class="ct" style="margin-bottom:10px">资产</div>';
-if(ak.length)for(var i=0;i<ak.length;i++)h+='<div class="ar"><span class="aname">'+E(ak[i])+'</span><span class="aval">¥'+N(a[ak[i]],'0')+'</span></div>';
-else h+='<div class="empty"><div class="ei">🏦</div>暂无资产</div>';
-h+='</div>';
-if(tx.length){h+='<div class="cell"><div class="ct" style="margin-bottom:8px">最近收支</div>';
-var st=Math.max(0,tx.length-10);for(var ti=st;ti<tx.length;ti++){var t=tx[ti],inc=t.type==='收入';h+='<div class="txr"><span class="txc">'+E(t.category)+'</span><span class="txn">'+E(t.note)+'</span><span class="txd">'+E(t.date)+'</span><span class="txa '+(inc?'in':'out')+'">'+(inc?'+':'')+'¥'+N(t.amount,'0')+'</span></div>';}
-h+='</div>';}
+var h='<div class="cell"><div class="ct" style="margin-bottom:10px">资产</div>';if(ak.length)for(var i=0;i<ak.length;i++)h+='<div class="ar"><span class="aname">'+E(ak[i])+'</span><span class="aval">'+FM(a[ak[i]])+'</span></div>';else h+='<div class="empty"><div class="ei">🏦</div>暂无资产</div>';h+='</div>';
+if(tx.length){h+='<div class="cell"><div class="ct" style="margin-bottom:8px">最近收支</div>';var st=Math.max(0,tx.length-10);for(var ti=st;ti<tx.length;ti++){var t=tx[ti],inc=t.type==='收入';h+='<div class="txr"><span class="txc">'+E(t.category)+'</span><span class="txn">'+E(t.note)+'</span><span class="txd">'+E(t.date)+'</span><span class="txa '+(inc?'in':'out')+'">'+(inc?'+':'')+FM(Math.abs(t.amount))+'</span></div>';}h+='</div>';}
 return h;}
-
-function rCalendar(d){var t=d.time||{};return'<div class="td"><div class="tc">'+String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0')+'</div><div class="tdt">'+N(t.year)+'年'+N(t.month)+'月'+N(t.day)+'日</div><div class="tw">'+E(t.weekday)+'</div><div class="ti">'+E(t.weather)+' · '+E(t.season)+'</div></div>';}
-
-function rContacts(d){var ml=d.npc_male||{},rels=d.profile&&d.profile.relationships||{},mk=Object.keys(ml),rk=Object.keys(rels),h='',hasAny=false;
-if(mk.length){for(var mi=0;mi<mk.length;mi++){var mn=ml[mk[mi]];hasAny=true;h+='<div class="cell"><div class="ch"><span class="ct">'+E(mn.name)+'</span><span class="cs">'+N(mn.age)+'岁</span></div><div class="cr"><span class="lbl">职业</span><span class="val">'+E(mn.occupation)+'</span></div><div class="cr"><span class="lbl">关系</span><span class="val">'+E(mn.social_status)+'</span></div></div>';}}
-for(var ri=0;ri<rk.length;ri++){var rel=rels[rk[ri]];if(rel.relation&&!/女友|恋人|情人/.test(rel.relation)){hasAny=true;h+='<div class="cell"><div class="ch"><span class="ct">'+E(rel.name)+'</span></div><div class="cr"><span class="lbl">关系</span><span class="val">'+E(rel.relation)+' - '+E(rel.status)+'</span></div></div>';}}
-return hasAny?h:'<div class="empty"><div class="ei">📇</div>暂无联系人</div>';}
-
-function rLover(d){var sx=d.sexual||{},sk=Object.keys(sx),h='';
-if(!sk.length)return'<div class="empty"><div class="ei">💕</div>暂无恋人</div>';
-for(var i=0;i<sk.length;i++){var u=sk[i],sn=sx[u],ph=G(sn,'menstrual.current_phase','安全期'),bc=({'安全期':'bs','受孕期':'bfe','月经中':'bpe'})[ph]||'';
-h+='<div class="nc" data-uid="'+u+'"><div class="nch"><span class="ncn">'+E(sn.name)+'</span><span class="nca">'+N(sn.age)+'岁</span></div><div style="font-size:11px;color:var(--dim);margin-top:3px">'+E(sn.outfit)+'</div>';
-h+='<div class="ncs"><span class="ncst">好感 '+B(sn.affection,100,'aff')+'</span><span class="ncst">服从 '+B(sn.obedience,100,'obed')+'</span><span class="badge '+bc+'">'+E(ph)+'</span></div>';
-h+='<div style="margin-top:4px">'+(sn.is_virgin?'<span class="tag tg">处</span>':'<span class="tag tnv">非处</span>')+(G(sn,'uterus.pregnancy')?'<span class="tag tp">孕</span>':'')+'<span style="font-size:11px;color:var(--dimmer);margin-left:4px">经验'+N((sn.experience||{}).total)+'次</span></div></div>';}
+function rCalendar(d){var t=d.time||{},evts=d.calendar_events||[],now=String(t.year)+'-'+String(t.month).padStart(2,'0')+'-'+String(t.day).padStart(2,'0'),up=evts.filter(function(ev){return ev.date>=now}).slice(0,5),tdy=evts.filter(function(ev){return ev.date===now});
+var h='<div class="td"><div class="tc">'+String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0')+'</div><div class="tdt">'+N(t.year)+'年'+N(t.month)+'月'+N(t.day)+'日</div><div class="tw">'+E(t.weekday)+'</div><div class="ti">'+E(t.weather)+' · '+E(t.season)+'</div></div>';
+if(tdy.length){h+='<div class="cell"><div class="ct" style="margin-bottom:6px">🎯 今日</div>';tdy.forEach(function(ev){h+='<div class="evc"><span class="evd">今天</span><div class="evi"><div class="evt">'+E(ev.title)+'</div><div class="evy">'+E(ev.type)+'</div></div></div>';});h+='</div>';}
+if(up.length){h+='<div class="cell"><div class="ct" style="margin-bottom:8px">📅 即将到来</div>';up.forEach(function(ev){h+='<div class="evc"><span class="evd">'+ev.date.slice(5)+'</span><div class="evi"><div class="evt">'+E(ev.title)+'</div><div class="evy">'+E(ev.type)+'</div></div></div>';});h+='</div>';}
 return h;}
-
-function rModal(sn){var bp=sn.body_parts||{},br=bp.breasts||{},nip=bp.nipples||{},vag=bp.vagina||{},ut=bp.uterus||{},an=bp.anus||{},mnst=sn.menstrual||{},exp=sn.experience||{};
-function mf(l,v){return'<div class="mf"><div class="mfl">'+l+'</div><div class="mfv">'+v+'</div></div>';}
-function bs(nm,fs){var h='<div class="bpt"><div class="bpn">'+nm+'</div><div class="bpg">';for(var i=0;i<fs.length;i++)h+=mf(fs[i][0],fs[i][1]);return h+'</div></div>';}
-var h='<div class="ms"><div class="mst">基本信息</div><div class="mg">';h+=mf('姓名',E(sn.name));h+=mf('年龄',N(sn.age)+'岁');h+=mf('出生',N(sn.birth_year)+'.'+N(sn.birth_month)+'.'+N(sn.birth_day));h+=mf('处女',sn.is_virgin?'是':'否');if(!sn.is_virgin&&sn.first_partner)h+=mf('初夜',E(sn.first_partner));h+=mf('好感',N(sn.affection)+'/100');h+=mf('服从',N(sn.obedience)+'/100');
-h+='</div></div><div class="ms"><div class="mst">外貌穿着</div>'+mf('外貌',E(sn.appearance))+mf('穿着',E(sn.outfit))+'</div>';
-if(sn.personality)h+='<div class="ms"><div class="mst">性格</div><div style="font-size:11px;color:var(--dim);line-height:1.7">'+E(sn.personality).replace(/\n/g,'<br>')+'</div></div>';
-h+='<div class="ms"><div class="mst">月经</div><div class="mg">'+mf('周期',N(mnst.cycle_length,'28')+'天')+mf('经期',N(mnst.period_duration,'5')+'天')+mf('上次',E(mnst.last_period_date))+mf('状态',E(mnst.current_phase))+'</div></div>';
-h+='<div class="ms"><div class="mst">性经验</div><div class="mg">'+mf('总计',N(exp.total)+'次')+mf('口交',N(exp.oral)+'次')+mf('插入',N(exp.vaginal)+'次')+mf('肛交',N(exp.anal)+'次')+mf('高潮',N(sn.orgasm_count)+'次')+'</div></div>';
-h+=bs('胸部',[['大小',E(br.size)],['形状',E(br.shape)],['颜色',E(br.color)],['敏感度',E(br.sensitivity)],['状态',E(br.status)]]);
-h+=bs('乳头',[['形状',E(nip.shape)],['颜色',E(nip.color)],['乳晕色',E(nip.areola_color)],['乳晕大',E(nip.areola_size)],['敏感度',E(nip.sensitivity)],['状态',E(nip.status)]]);
-h+=bs('小穴',[['形状',E(vag.shape)],['外阴色',E(vag.color)],['内壁色',E(vag.inner_color)],['松紧',E(vag.tightness)],['湿润',E(vag.wetness)],['敏感度',E(vag.sensitivity)],['状态',E(vag.status)]]);
-h+=bs('子宫',[['正常',ut.is_normal?'是':'异常'],['怀孕',ut.pregnancy?E(ut.pregnancy):'无'],['敏感度',E(ut.sensitivity)],['状态',E(ut.status)]]);
-h+=bs('肛门',[['形状',E(an.shape)],['颜色',E(an.color)],['松紧',E(an.tightness)],['敏感度',E(an.sensitivity)],['开发',an.is_developed?'是':'未'],['状态',E(an.status)]]);
-var fet=sn.fetishes||[];if(fet.length){h+='<div class="ms"><div class="mst">性癖</div>';for(var fi=0;fi<fet.length;fi++)h+='<span class="tag">'+E(fet[fi])+'</span>';h+='</div>';}
-return h;}
-
-function rWeChat(d){var sx=d.sexual||{},ml=d.npc_male||{},rels=(d.profile||{}).relationships||{},h='<div class="wxl">',contacts=[],hasContacts=false;
-Object.keys(sx).forEach(function(k){contacts.push({name:sx[k].name,msg:'点击查看对话',time:'',type:'lover',uid:k});hasContacts=true;});
-Object.keys(ml).forEach(function(k){contacts.push({name:ml[k].name,msg:'暂无消息',time:'',type:'male',uid:k});hasContacts=true;});
-Object.keys(rels).forEach(function(k){var f=contacts.find(function(c){return c.name===rels[k].name});if(!f){contacts.push({name:rels[k].name,msg:'暂无消息',time:'',type:'rel',uid:k});hasContacts=true;}});
-var wx=d.wechat||{};Object.keys(wx).forEach(function(k){var msgs=wx[k].messages||[],last=msgs.length?msgs[msgs.length-1]:null,ex=contacts.find(function(c){return c.name===wx[k].name||c.name===k});if(ex){ex.msg=last?(last.from+': '+last.text):'暂无消息';ex.time=last?last.time:'';}else{if(wx[k].name){contacts.push({name:wx[k].name,msg:last?(last.from+': '+last.text):'暂无消息',time:last?last.time:'',type:'wx',uid:k});hasContacts=true;}}});
-if(!hasContacts)return'<div class="empty"><div class="ei">💬</div>暂无联系人</div>';
-contacts.forEach(function(c){h+='<div class="wxc" data-wx-name="'+E(c.name)+'" data-wx-uid="'+E(c.uid||c.name)+'"><div class="wxa">'+E(c.name.charAt(0))+'</div><div class="wxi"><div class="wxn">'+E(c.name)+'</div><div class="wxp">'+E(c.msg)+'</div></div><div class="wxt">'+E(c.time)+'</div></div>';});
-return h+'</div>';}
-
-function rWxChat(d,nm){var wx=d.wechat||{},cd=null;Object.keys(wx).forEach(function(k){if(wx[k].name===nm||k===nm)cd=wx[k];});
-if(!cd||!(cd.messages||[]).length)return'<div class="empty"><div class="ei">💬</div>暂无聊天记录</div>';
-var msgs=cd.messages||[],h='<div class="wxchat">';
-msgs.forEach(function(m){var isMe=m.from==='我'||m.from==='me';if(m.time)h+='<div class="wxbt">'+E(m.time)+'</div>';h+='<div class="wxb '+(isMe?'me':'you')+'">'+E(m.text)+'</div>';});
-return h+'</div>';}
-
-function rWeibo(d){var wb=d.weibo||{},posts=wb.posts||[];
-if(!posts.length)return'<div class="empty"><div class="ei">📰</div>暂无微博<br><span style="font-size:11px;margin-top:4px;display:block">热点将在剧情推进中生成</span></div>';
-var h='';posts.forEach(function(p){var cc={'科技':'tech','娱乐':'ent','时政':'pol','社会':'soc'}[p.category]||'soc';
-h+='<div class="wp"><span class="wcat '+cc+'">'+E(p.category)+'</span><div class="wph"><div class="wpa">📰</div><span class="wpu">'+E(p.source||'微博热搜')+'</span><span class="wpt">'+E(p.time)+'</span></div><div class="wpti">'+E(p.title)+'</div>'+(p.summary?'<div class="wpb">'+E(p.summary)+'</div>':'')+'</div>';});
-return h;}
-
-function rKotodama(d){
-var kd=d.kotodama||{},records=kd.records||[];
-if(!records.length)return'<div class="empty"><div class="ei">✨</div>尚未使用言灵<br><span style="font-size:11px;margin-top:5px;display:block">使用言灵后记录将显示在此</span></div>';
-var active=records.filter(function(r){return r.active!==false});
-var revoked=records.filter(function(r){return r.active===false});
-var total=records.length,ac=active.length;
-var h='<div style="font-size:12px;color:var(--dim);margin-bottom:12px">共 '+total+' 条（生效 '+ac+'，撤销 '+(total-ac)+'）</div>';
-var shown=active.slice(-3).reverse();
-shown.forEach(function(r){h+=kdCard(r);});
-var older=active.slice(0,-3);
-if(older.length>0||revoked.length>0){
-h+='<div class="kd-fold" onclick="var t=this.nextElementSibling;var s=t.style.display==\'block\'?\'none\':\'block\';t.style.display=s;this.innerHTML=s==\'block\'?\'▲ 收起（'+(older.length+revoked.length)+'条）\':\'▼ 展开（'+(older.length+revoked.length)+'条）\';">▼ 展开（'+(older.length+revoked.length)+'条）</div>';
-h+='<div class="kd-folded">';
-older.reverse().forEach(function(r){h+=kdCard(r);});
-revoked.slice().reverse().forEach(function(r){h+=kdCard(r);});
-h+='</div>';
-}
-return h;
-}
-function kdCard(r){var a=r.active!==false;return'<div class="kd-card'+(a?'':' revoked')+'"><div class="kd-id">#'+N(r.id)+'</div><div class="kd-cmd">'+E(r.command)+'</div><div class="kd-result">'+E(r.result)+'</div><div class="kd-time">'+E(r.time)+'</div><span class="kd-badge '+(a?'active':'revoked')+'">'+(a?'生效中':'已撤销')+'</span></div>';}
-
-function setHtml(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html||'';}
-
-function refresh(){
-if(isRefreshing)return;isRefreshing=true;
-try{
-var d=readData();if(d&&Object.keys(d).length>0){var ns=JSON.stringify(d);if(ns!==sig){sig=ns;lastGood=d;}}
-var sd=lastGood||{};cur=sd;
-var t=sd.time||{};
-// Update status bar time
-var st=document.getElementById('sb-time');if(st)st.textContent=String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0');
-// Update home screen date
-var wd=document.getElementById('h-weekday');if(wd)wd.textContent=S(t.weekday);
-var dt=document.getElementById('h-date');if(dt)dt.textContent=N(t.month)+'月'+N(t.day)+'日';
-var wt=document.getElementById('h-weather');if(wt)wt.textContent=S(t.weather)+' · '+S(t.season);
-// Update calendar icon
-var cd=document.getElementById('cal-day');if(cd)cd.textContent=String(t.day||14);
-// Render pages
-setHtml('body-profile',rProfile(sd));setHtml('body-bank',rBank(sd));setHtml('body-calendar',rCalendar(sd));
-setHtml('body-contacts',rContacts(sd));setHtml('body-lover',rLover(sd));setHtml('body-wechat',rWeChat(sd));
-setHtml('body-weibo',rWeibo(sd));setHtml('body-kotodama',rKotodama(sd));
-bindNpc();bindWx();
-}catch(e){console.error('SB:',e);}
-isRefreshing=false;
-}
-function bindNpc(){document.querySelectorAll('#body-lover .nc').forEach(function(c){if(c._b)return;c._b=true;c.addEventListener('click',function(){var u=c.getAttribute('data-uid'),sn=G(cur,'sexual.'+u);if(!sn)return;document.getElementById('npc-modal-title').textContent=S(sn.name)+' - 详情';document.getElementById('npc-modal-body').innerHTML=rModal(sn);document.getElementById('npc-modal').classList.add('open');});});}
-function bindWx(){document.querySelectorAll('#body-wechat .wxc').forEach(function(el){if(el._wb)return;el._wb=true;el.addEventListener('click',function(){var n=el.getAttribute('data-wx-name');WX_CHAT_CONTACT=n;document.getElementById('wxchat-title').textContent=n;setHtml('body-wxchat',rWxChat(cur,n));navTo('app-wxchat');});});}
-
-function navTo(id){document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('open')});document.getElementById('npc-modal').classList.remove('open');var pg=document.getElementById(id);if(pg)pg.classList.add('open');}
+function rContacts(d){var ml=d.npc_male||{},rels=(d.profile||{}).relationships||{},mk=Object.keys(ml),rk=Object.keys(rels),h='',ha=false;
+if(mk.length){for(var mi=0;mi<mk.length;mi++){var mn=ml[mk[mi]];ha=true;h+='<div class="cell"><div class="ch"><span class="ct">'+E(mn.name)+'</span><span class="cs">'+N(mn.age)+'岁</span></div><div class="cr"><span class="lbl">职业</span><span class="val">'+E(mn.occupation)+'</span></div><div class="cr"><span class="lbl">关系</span><span class="val">'+E(mn.social_status)+'</span></div></div>';}}
+for(var ri=0;ri<rk.length;ri++){var rel=rels[rk[ri]];if(rel.relation&&!/女友|恋人|情人/.test(rel.relation)){ha=true;h+='<div class="cell"><div class="ch"><span class="ct">'+E(rel.name)+'</span></div><div class="cr"><span class="lbl">关系</span><span class="val">'+E(rel.relation)+' - '+E(rel.status)+'</span></div></div>';}}
+return ha?h:'<div class="empty"><div class="ei">📇</div>暂无联系人</div>';}
+function rConnections(d){var co=d.connections||[];
+if(!co.length)return'<div class="empty"><div class="ei">🕸</div>暂无人脉数据<br><span style="font-size:11px;margin-top:5px;display:block">NPC关联将在剧情中自动生成</span></div>';
+var h='<div class="cell">';co.forEach(function(c){h+='<div class="cn"><div class="ca">'+E(c.from.charAt(0))+'</div><div class="ci"><div class="cnm">'+E(c.from)+'</div></div><span class="car">→</span><div class="ca">'+E(c.to.charAt(0))+'</div><div class="ci"><div class="cnm">'+E(c.to)+'</div></div></div>';h+='<div style="font-size:10px;color:var(--dim);margin-left:28px;margin-bottom:6px">'+E(c.relation)+'</div>';});h+='</div>';return h;}
+function rLover(d){var sx=d.sexual||{},sk=Object.keys(sx),h='';if(!sk.length)return'<div class="empty"><div class="ei">💕</div>暂无恋人</div>';
+for(var i=0;i<sk.length;i++){var u=sk[i],sn=sx[u],ph=G(sn,'menstrual.current_phase','安全期'),bc=({'安全期':'bs','受孕期':'bfe','月经中':'bpe'})[ph]||'';h+='<div class="nc" data-uid="'+u+'"><div class="nch"><span class="ncn">'+E(sn.name)+'</span><span class="nca">'+N(sn.age)+'岁</span></div><div style="font-size:11px;color:var(--dim);margin-top:3px">'+E(sn.outfit)+'</div><div class="ncs"><span class="ncst">好感 '+Bb(sn.affection,100,'aff')+'</span><span class="ncst">服从 '+Bb(sn.obedience,100,'obed')+'</span><span class="badge '+bc+'">'+E(ph)+'</span></div><div style="margin-top:4px">'+(sn.is_virgin?'<span class="tag tg">处</span>':'<span class="tag tnv">非处</span>')+(G(sn,'uterus.pregnancy')?'<span class="tag tp">孕</span>':'')+'<span style="font-size:11px;color:var(--dimmer);margin-left:4px">经验'+N((sn.experience||{}).total)+'次</span></div></div>';}return h;}
+function rModal(sn){var bp=sn.body_parts||{},br=bp.breasts||{},nip=bp.nipples||{},vag=bp.vagina||{},ut=bp.uterus||{},an=bp.anus||{},mnst=sn.menstrual||{},exp=sn.experience||{};function mf(l,v){return'<div class="mf"><div class="mfl">'+l+'</div><div class="mfv">'+v+'</div></div>';}function bs(nm,fs){var h='<div class="bpt"><div class="bpn">'+nm+'</div><div class="bpg">';for(var i=0;i<fs.length;i++)h+=mf(fs[i][0],fs[i][1]);return h+'</div></div>';}var h='<div class="ms"><div class="mst">基本信息</div><div class="mg">';h+=mf('姓名',E(sn.name));h+=mf('年龄',N(sn.age)+'岁');h+=mf('出生',N(sn.birth_year)+'.'+N(sn.birth_month)+'.'+N(sn.birth_day));h+=mf('处女',sn.is_virgin?'是':'否');if(!sn.is_virgin&&sn.first_partner)h+=mf('初夜',E(sn.first_partner));h+=mf('好感',N(sn.affection)+'/100');h+=mf('服从',N(sn.obedience)+'/100');h+='</div></div><div class="ms"><div class="mst">外貌穿着</div>'+mf('外貌',E(sn.appearance))+mf('穿着',E(sn.outfit))+'</div>';if(sn.personality)h+='<div class="ms"><div class="mst">性格</div><div style="font-size:11px;color:var(--dim);line-height:1.7">'+E(sn.personality).replace(/\n/g,'<br>')+'</div></div>';h+='<div class="ms"><div class="mst">月经</div><div class="mg">'+mf('周期',N(mnst.cycle_length,'28')+'天')+mf('经期',N(mnst.period_duration,'5')+'天')+mf('上次',E(mnst.last_period_date))+mf('状态',E(mnst.current_phase))+'</div></div>';h+='<div class="ms"><div class="mst">性经验</div><div class="mg">'+mf('总计',N(exp.total)+'次')+mf('口交',N(exp.oral)+'次')+mf('插入',N(exp.vaginal)+'次')+mf('肛交',N(exp.anal)+'次')+mf('高潮',N(sn.orgasm_count)+'次')+'</div></div>';h+=bs('胸部',[['大小',E(br.size)],['形状',E(br.shape)],['颜色',E(br.color)],['敏感度',E(br.sensitivity)],['状态',E(br.status)]]);h+=bs('乳头',[['形状',E(nip.shape)],['颜色',E(nip.color)],['乳晕色',E(nip.areola_color)],['乳晕大',E(nip.areola_size)],['敏感度',E(nip.sensitivity)],['状态',E(nip.status)]]);h+=bs('小穴',[['形状',E(vag.shape)],['外阴色',E(vag.color)],['内壁色',E(vag.inner_color)],['松紧',E(vag.tightness)],['湿润',E(vag.wetness)],['敏感度',E(vag.sensitivity)],['状态',E(vag.status)]]);h+=bs('子宫',[['正常',ut.is_normal?'是':'异常'],['怀孕',ut.pregnancy?E(ut.pregnancy):'无'],['敏感度',E(ut.sensitivity)],['状态',E(ut.status)]]);h+=bs('肛门',[['形状',E(an.shape)],['颜色',E(an.color)],['松紧',E(an.tightness)],['敏感度',E(an.sensitivity)],['开发',an.is_developed?'是':'未'],['状态',E(an.status)]]);var fet=sn.fetishes||[];if(fet.length){h+='<div class="ms"><div class="mst">性癖</div>';for(var fi=0;fi<fet.length;fi++)h+='<span class="tag">'+E(fet[fi])+'</span>';h+='</div>';}return h;}
+function rWeChat(d){var sx=d.sexual||{},ml=d.npc_male||{},rels=(d.profile||{}).relationships||{},h='<div class="wxl">',cs=[],hc=false;Object.keys(sx).forEach(function(k){cs.push({n:sx[k].name,m:'点击查看对话',t:'',uid:k});hc=true;});Object.keys(ml).forEach(function(k){cs.push({n:ml[k].name,m:'暂无消息',t:'',uid:k});hc=true;});Object.keys(rels).forEach(function(k){var f=cs.find(function(c){return c.n===rels[k].name});if(!f){cs.push({n:rels[k].name,m:'暂无消息',t:'',uid:k});hc=true;}});var wx=d.wechat||{};Object.keys(wx).forEach(function(k){var ms=wx[k].messages||[],l=ms.length?ms[ms.length-1]:null,e=cs.find(function(c){return c.n===wx[k].name||c.n===k});if(e){e.m=l?(l.from+': '+l.text):'暂无消息';e.t=l?l.time:'';}else{if(wx[k].name){cs.push({n:wx[k].name,m:l?(l.from+': '+l.text):'暂无消息',t:l?l.time:'',uid:k});hc=true;}}});if(!hc)return'<div class="empty"><div class="ei">💬</div>暂无联系人</div>';cs.forEach(function(c){h+='<div class="wxc" data-wx-n="'+E(c.n)+'"><div class="wxa">'+E(c.n.charAt(0))+'</div><div class="wxi"><div class="wxn">'+E(c.n)+'</div><div class="wxp">'+E(c.m)+'</div></div><div class="wxt">'+E(c.t)+'</div></div>';});return h+'</div>';}
+function rWxChat(d,nm){var wx=d.wechat||{},cd=null;Object.keys(wx).forEach(function(k){if(wx[k].name===nm||k===nm)cd=wx[k];});if(!cd||!(cd.messages||[]).length)return'<div class="empty"><div class="ei">💬</div>暂无聊天记录</div>';var ms=cd.messages||[],h='<div class="wxchat">';ms.forEach(function(m){var im=m.from==='我'||m.from==='me';if(m.time)h+='<div class="wxbt">'+E(m.time)+'</div>';h+='<div class="wxb '+(im?'me':'you')+'">'+E(m.text)+'</div>';});return h+'</div>';}
+function rWeibo(d){var wb=d.weibo||{},ps=wb.posts||[];if(!ps.length)return'<div class="empty"><div class="ei">📰</div>暂无微博<br><span style="font-size:11px;margin-top:4px;display:block">热点将在剧情推进中生成</span></div>';var h='';ps.forEach(function(p){var cc={'科技':'tc','娱乐':'en','时政':'po','社会':'so'}[p.category]||'so';h+='<div class="wp"><span class="wcat '+cc+'">'+E(p.category)+'</span><div class="wph"><div class="wpa">📰</div><span class="wpu">'+E(p.source||'微博热搜')+'</span><span class="wpt">'+E(p.time)+'</span></div><div class="wpti">'+E(p.title)+'</div>'+(p.summary?'<div class="wpb">'+E(p.summary)+'</div>':'')+'</div>';});return h;}
+function rKotodama(d){var kd=d.kotodama||{},rs=kd.records||[];if(!rs.length)return'<div class="empty"><div class="ei">✨</div>尚未使用言灵</div>';var ac=rs.filter(function(r){return r.active!==false}),rv=rs.filter(function(r){return r.active===false}),t=rs.length;var h='<div style="font-size:12px;color:var(--dim);margin-bottom:12px">共'+t+'条（生效'+ac.length+'，撤销'+rv.length+'）</div>';var sh=ac.slice(-3).reverse();sh.forEach(function(r){h+=kdc(r,true);});var old=ac.slice(0,-3),fc=old.length+rv.length;if(fc>0){h+='<div class="kd-fold" onclick="var t=this.nextElementSibling;var s=t.style.display==\'block\'?\'none\':\'block\';t.style.display=s;this.innerHTML=s==\'block\'?\'▲ 收起（'+fc+'条）\':\'▼ 展开（'+fc+'条）\';">▼ 展开（'+fc+'条）</div>';h+='<div class="kd-folded">';old.reverse().forEach(function(r){h+=kdc(r,true);});rv.slice().reverse().forEach(function(r){h+=kdc(r,false);});h+='</div>';}return h;}
+function kdc(r,a){return'<div class="kdc'+(a?'':' rv')+'"><div class="kd-id">#'+N(r.id)+'</div><div class="kd-cmd">'+E(r.command)+'</div><div class="kd-res">'+E(r.result)+'</div><div class="kd-time">'+E(r.time)+'</div><span class="kd-badge '+(a?'ac':'rk')+'">'+(a?'生效中':'已撤销')+'</span></div>';}
+function SH(id,html){var el=document.getElementById(id);if(el)el.innerHTML=html||'';}
+function SB(id,n){var el=document.getElementById(id);if(!el)return;if(n>0){el.textContent=n>99?'99+':String(n);el.classList.add('on');}else{el.classList.remove('on');}}
+function refresh(){if(rf)return;rf=true;try{var d=readData();if(d&&Object.keys(d).length>0){var ns=JSON.stringify(d);if(ns!==sig){sig=ns;lastGood=d;}}var sd=lastGood||{};cur=sd;var t=sd.time||{};var st=document.getElementById('sb-time');if(st)st.textContent=String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0');var wd=document.getElementById('h-weekday');if(wd)wd.textContent=S(t.weekday);var dt=document.getElementById('h-date');if(dt)dt.textContent=N(t.month)+'月'+N(t.day)+'日';var wi=document.getElementById('ww-icon');if(wi)wi.textContent=WI[t.weather]||'☀️';var wt=document.getElementById('ww-temp');if(wt)wt.textContent=S(t.weather);var wd2=document.getElementById('ww-desc');if(wd2)wd2.textContent=S(t.season);var cd=document.getElementById('cal-day');if(cd)cd.textContent=String(t.day||14);SH('body-profile',rProfile(sd));SH('body-bank',rBank(sd));SH('body-calendar',rCalendar(sd));SH('body-contacts',rContacts(sd));SH('body-connections',rConnections(sd));SH('body-lover',rLover(sd));SH('body-wechat',rWeChat(sd));SH('body-weibo',rWeibo(sd));SH('body-kotodama',rKotodama(sd));var sx=sd.sexual||{};SB('bg-lover',Object.keys(sx).length);var wx=sd.wechat||{};SB('bg-wechat',Object.keys(wx).length);var wb=sd.weibo||{},wbp=wb.posts||[];SB('bg-weibo',wbp.length);var kd2=sd.kotodama||{},kdr2=kd2.records||[],kda2=kdr2.filter(function(r){return r.active!==false});SB('bg-kotodama',kda2.length);var cs=sd.connections||[];SB('bg-connections',cs.length);var ml2=sd.npc_male||{};SB('bg-contacts',Object.keys(ml2).length);bNpc();bWx();}catch(e){console.error('SB:',e);}rf=false;}
+function bNpc(){document.querySelectorAll('#body-lover .nc').forEach(function(c){if(c._b)return;c._b=true;c.addEventListener('click',function(){var u=c.getAttribute('data-uid'),sn=G(cur,'sexual.'+u);if(!sn)return;document.getElementById('npc-modal-title').textContent=S(sn.name)+' - 详情';document.getElementById('npc-modal-body').innerHTML=rModal(sn);document.getElementById('npc-modal').classList.add('open');});});}
+function bWx(){document.querySelectorAll('#body-wechat .wxc').forEach(function(el){if(el._wb)return;el._wb=true;el.addEventListener('click',function(){var n=el.getAttribute('data-wx-n');WXC=n;document.getElementById('wxchat-title').textContent=n;SH('body-wxchat',rWxChat(cur,n));nav('app-wxchat');});});}
+function nav(id){document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('open')});document.getElementById('npc-modal').classList.remove('open');var pg=document.getElementById(id);if(pg)pg.classList.add('open');}
 function goHome(){document.querySelectorAll('.app-page').forEach(function(p){p.classList.remove('open')});document.getElementById('npc-modal').classList.remove('open');document.getElementById('app-wxchat').classList.remove('open');}
-
-document.querySelectorAll('.app-icon').forEach(function(ic){ic.addEventListener('click',function(){var a=ic.getAttribute('data-app');navTo('app-'+a);});});
-document.querySelectorAll('.back').forEach(function(btn){btn.addEventListener('click',function(){var t=btn.getAttribute('data-back');if(t==='home')goHome();else if(t==='wechat'){goHome();navTo('app-wechat');}else if(t==='lover'){goHome();navTo('app-lover');}});});
+document.querySelectorAll('.ai').forEach(function(ic){ic.addEventListener('click',function(){var a=ic.getAttribute('data-app');nav('app-'+a);});});
+document.querySelectorAll('.bk').forEach(function(btn){btn.addEventListener('click',function(){var t=btn.getAttribute('data-back');if(t==='home')goHome();else if(t==='wechat'){goHome();nav('app-wechat');}else if(t==='lover'){goHome();nav('app-lover');}});});
 document.getElementById('npc-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-
 async function init(){
 try{if(typeof waitGlobalInitialized==='function')await waitGlobalInitialized('Mvu');}catch(e){}
 try{if(typeof waitUntil==='function')await waitUntil(function(){var d=readData();return d&&Object.keys(d).length>0;},{timeout:15000,intervalBetweenAttempts:300});}catch(e){}
 refresh();setTimeout(function(){refresh();},600);setTimeout(function(){refresh();},2000);initDone=true;
 try{if(typeof eventOn==='function'&&typeof Mvu!=='undefined'&&Mvu.events){eventOn(Mvu.events.VARIABLE_UPDATE_ENDED,function(){if(initDone)refresh();});eventOn(Mvu.events.VARIABLE_INITIALIZED,function(){if(initDone){sig='';refresh();}});}}catch(e){}
 try{if(typeof eventOn==='function'&&typeof tavern_events!=='undefined'){eventOn(tavern_events.MESSAGE_RECEIVED,function(){setTimeout(refresh,800)});eventOn(tavern_events.MESSAGE_UPDATED,function(){setTimeout(refresh,400)});}}catch(e){}
-setInterval(function(){if(initDone)refresh();},5000);
-}
+setInterval(function(){if(initDone)refresh();},5000);}
 if(typeof $!=='undefined'){$(function(){init()})}else if(document.readyState==='complete'){init()}else{window.addEventListener('load',init)}
 })();
 </script>
