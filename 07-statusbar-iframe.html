@@ -164,20 +164,28 @@ body {
   function n(v,d){var x=Number(v);return isNaN(x)?(d!=null?String(d):'0'):String(x);}
 
   function readData() {
-    if (typeof getVariables === 'function') {
-      try {
-        var r = getVariables({ type: 'message' });
-        if (r && r.stat_data && Object.keys(r.stat_data).length) return r;
-      } catch(e) {}
-    }
+    // MVU stores stat_data in message 0 (from InitVar), patches accumulate there
     if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
+      for (var mi = 0; mi <= 2; mi++) {
+        try {
+          var r = Mvu.getMvuData({ type: 'message', message_id: mi });
+          if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
+        } catch(e) {}
+      }
+    }
+    if (typeof getVariables === 'function') {
+      for (var mi = 0; mi <= 2; mi++) {
+        try {
+          var r = getVariables({ type: 'message', message_id: mi });
+          if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
+        } catch(e) {}
+      }
       try {
-        var msgId = typeof getCurrentMessageId === 'function' ? getCurrentMessageId() : undefined;
-        var r = Mvu.getMvuData({ type: 'message', message_id: msgId });
-        if (r && r.stat_data && Object.keys(r.stat_data).length) return r;
+        var r = getVariables({ type: 'chat' });
+        if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
       } catch(e) {}
     }
-    return lastGood || { stat_data: {} };
+    return lastGood || {};
   }
 
   function renderProfile(d) {
