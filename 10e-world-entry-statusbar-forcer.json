@@ -1,0 +1,24 @@
+{
+  "entries": {
+    "10": {
+      "use_regex": false,
+      "depth": 4,
+      "position": 7,
+      "constant": true,
+      "uid": 10,
+      "keys": [],
+      "display_index": 3,
+      "recursion": {
+        "delay_until": null,
+        "prevent_outgoing": true,
+        "prevent_incoming": true
+      },
+      "comment": "[mvu_plot]状态栏占位符强制输出",
+      "order": 500,
+      "content": "【硬性要求】每次回复末尾必须输出 <StatusPlaceHolderImpl/>\n\n这是系统渲染管线的硬性要求。无论回复内容是什么——正常叙事、对话、内心独白、战斗场景——都在回复的**最后一行**输出:\n\n<StatusPlaceHolderImpl/>\n\n不要省略。不要解释。不要用其他标签代替。不要将其包裹在任何代码块或标记中。\n\n这个标签对剧情 AI 不可见，你只需要在输出末尾保留它即可。",
+      "keysecondary": [],
+      "enabled": true,
+      "selectiveLogic": 0
+    }
+  }
+}

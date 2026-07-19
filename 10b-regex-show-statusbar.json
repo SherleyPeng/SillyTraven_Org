@@ -1,6 +1,6 @@
 {
-  "scriptName": "状态栏显示",
-  "findRegex": "/<StatusBar\\/>/gm",
+  "scriptName": "状态栏显示(StatusBar+StatusPlaceHolderImpl)",
+  "findRegex": "/<Status(?:Bar|PlaceHolderImpl)\\/>/gm",
   "replaceString": "```html\n<body>\n<script>\n$('body').load('https://sherleypeng.github.io/SillyTraven_Org/07-statusbar-iframe.html')\n</script>\n</body>\n```",
   "placement": [2],
   "markdownOnly": true,

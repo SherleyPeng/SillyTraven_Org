@@ -185,7 +185,7 @@
                                              },
                                "comment":  "[mvu_plot]状态栏占位符",
                                "order":  900,
-                               "content":  "在每次回复的末尾，必须输出 \u003cStatusBar/\u003e",
+                               "content":  "【硬性系统要求】每次回复末尾必须输出 <StatusPlaceHolderImpl/>\n\n这是系统渲染管线硬件级要求。无论剧情进展如何，每轮回复的最后一行必须是:\n\n<StatusPlaceHolderImpl/>\n\n规则:\n- 必须另起一行，独立成行\n- 不要将其包裹在 markdown 代码块内\n- 不要省略、跳过或用任何其他文字代替\n- 不要对这行做任何解释\n- 该标签对 AI 不可见，照做即可",
                                "keysecondary":  [
 
                                                 ],

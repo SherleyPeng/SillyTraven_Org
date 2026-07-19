@@ -103,8 +103,9 @@ body {
 .tnv { color:var(--warn); }
 .tp { color:var(--danger); }
 
-/* Empty */
+/* Empty / Loading */
 .empty { text-align:center; padding:24px; color:var(--dim); font-size:12px; }
+.loading { text-align:center; padding:24px; color:var(--accent); font-size:12px; }
 
 /* Row */
 .row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:11px; }
@@ -139,10 +140,10 @@ body {
     <button class="tab" data-i="2">&#x1F550; 时间</button>
     <button class="tab" data-i="3">&#x1F495; 关系</button>
   </div>
-  <div class="pnl act" id="p-0"></div>
-  <div class="pnl" id="p-1"></div>
-  <div class="pnl" id="p-2"></div>
-  <div class="pnl" id="p-3"></div>
+  <div class="pnl act" id="p-0"><div class="loading">数据加载中...</div></div>
+  <div class="pnl" id="p-1"><div class="loading">数据加载中...</div></div>
+  <div class="pnl" id="p-2"><div class="loading">数据加载中...</div></div>
+  <div class="pnl" id="p-3"><div class="loading">数据加载中...</div></div>
 
   <div class="modal" id="modal">
     <div class="modal-hd">
@@ -158,32 +159,23 @@ body {
   var cur = {};
   var sig = '';
   var lastGood = null;
+  var isRefreshing = false;
+  var initDone = false;
 
   function g(obj,path,def){if(!obj||!path)return def;var k=path.replace(/\[(\d+)\]/g,'.$1').split('.'),c=obj;for(var i=0;i<k.length;i++){if(c==null)return def;c=c[k[i]];}return c!=null?c:def;}
   function s(v,d){return(v==null||v==='')?(d||'-'):String(v);}
   function n(v,d){var x=Number(v);return isNaN(x)?(d!=null?String(d):'0'):String(x);}
 
   function readData() {
-    // MVU stores stat_data in message 0 (from InitVar), patches accumulate there
+    // Priority: MVU getMvuData with message_id: 'latest' → message 0 → getVariables
     if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
-      for (var mi = 0; mi <= 2; mi++) {
-        try {
-          var r = Mvu.getMvuData({ type: 'message', message_id: mi });
-          if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
-        } catch(e) {}
-      }
+      try { var r = Mvu.getMvuData({ type: 'message', message_id: 'latest' }); if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data; } catch(e) {}
+      try { var r = Mvu.getMvuData({ type: 'message', message_id: 0 }); if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data; } catch(e) {}
     }
     if (typeof getVariables === 'function') {
-      for (var mi = 0; mi <= 2; mi++) {
-        try {
-          var r = getVariables({ type: 'message', message_id: mi });
-          if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
-        } catch(e) {}
-      }
-      try {
-        var r = getVariables({ type: 'chat' });
-        if (r && r.stat_data && Object.keys(r.stat_data).length) return r.stat_data;
-      } catch(e) {}
+      try { var v = getVariables({ type: 'message', message_id: 'latest' }); if (v && v.stat_data && Object.keys(v.stat_data).length) return v.stat_data; } catch(e) {}
+      try { var v = getVariables({ type: 'message', message_id: 0 }); if (v && v.stat_data && Object.keys(v.stat_data).length) return v.stat_data; } catch(e) {}
+      try { var v = getVariables({ type: 'chat' }); if (v && v.stat_data && Object.keys(v.stat_data).length) return v.stat_data; } catch(e) {}
     }
     return lastGood || {};
   }
@@ -269,31 +261,34 @@ body {
   }
 
   function refresh() {
-    var data = readData();
-    if (data && data.stat_data) {
-      var ns = JSON.stringify(data.stat_data);
-      if (ns === sig) return;
-      sig = ns;
-      lastGood = data;
-    }
-    var sd = (data && data.stat_data) || (lastGood && lastGood.stat_data) || {};
-    cur = sd;
+    if (isRefreshing) return;
+    isRefreshing = true;
+    try {
+      var data = readData();
+      if (data && Object.keys(data).length > 0) {
+        var ns = JSON.stringify(data);
+        if (ns !== sig) { sig = ns; lastGood = data; }
+      }
+      var sd = lastGood || {};
+      cur = sd;
 
-    var p0=document.getElementById('p-0');if(p0)p0.innerHTML=renderProfile(sd)||'<div class="empty">暂无数据</div>';
-    var p1=document.getElementById('p-1');if(p1)p1.innerHTML=renderFinance(sd)||'<div class="empty">暂无数据</div>';
-    var p2=document.getElementById('p-2');if(p2)p2.innerHTML=renderTime(sd)||'<div class="empty">暂无数据</div>';
-    var p3=document.getElementById('p-3');if(p3)p3.innerHTML=renderRelations(sd)||'<div class="empty">暂无数据</div>';
+      var p0=document.getElementById('p-0');if(p0)p0.innerHTML=renderProfile(sd)||'<div class="empty">暂无数据</div>';
+      var p1=document.getElementById('p-1');if(p1)p1.innerHTML=renderFinance(sd)||'<div class="empty">暂无数据</div>';
+      var p2=document.getElementById('p-2');if(p2)p2.innerHTML=renderTime(sd)||'<div class="empty">暂无数据</div>';
+      var p3=document.getElementById('p-3');if(p3)p3.innerHTML=renderRelations(sd)||'<div class="empty">暂无数据</div>';
 
-    document.querySelectorAll('.npc').forEach(function(c){
-      if(c._b)return;c._b=true;
-      c.addEventListener('click',function(){
-        var uid=c.getAttribute('data-uid');
-        var sn=g(sd,'sexual.'+uid);if(!sn)return;
-        document.getElementById('modal-t').textContent=s(sn.name)+' - 详情';
-        document.getElementById('modal-b').innerHTML=renderModalBody(sn);
-        document.getElementById('modal').classList.add('act');
+      document.querySelectorAll('.npc').forEach(function(c){
+        if(c._b)return;c._b=true;
+        c.addEventListener('click',function(){
+          var uid=c.getAttribute('data-uid');
+          var sn=g(sd,'sexual.'+uid);if(!sn)return;
+          document.getElementById('modal-t').textContent=s(sn.name)+' - 详情';
+          document.getElementById('modal-b').innerHTML=renderModalBody(sn);
+          document.getElementById('modal').classList.add('act');
+        });
       });
-    });
+    } catch(e) { console.error('StatusBar refresh error:', e); }
+    isRefreshing = false;
   }
 
   // Tabs
@@ -307,29 +302,75 @@ body {
     });
   });
 
-  // Modal
+  // Modal close
   document.getElementById('modal-x').addEventListener('click',function(){document.getElementById('modal').classList.remove('act')});
   document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('act')});
 
-  // Init
-  refresh();
-
-  // Events
-  try {
-    if (typeof eventOn === 'function' && typeof Mvu !== 'undefined' && Mvu.events) {
-      eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, function(){ refresh(); });
-      eventOn(Mvu.events.VARIABLE_INITIALIZED, function(){ refresh(); });
+  // ====== Proper Initialization Sequence ======
+  async function init() {
+    // Step 1: Wait for MVU
+    try {
+      if (typeof waitGlobalInitialized === 'function') {
+        await waitGlobalInitialized('Mvu');
+      }
+    } catch(e) {
+      console.error('StatusBar: waitGlobalInitialized(Mvu) failed', e);
     }
-  } catch(e) {}
 
-  try {
-    if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined') {
-      eventOn(tavern_events.MESSAGE_RECEIVED, function(){ setTimeout(refresh, 500); });
-      eventOn(tavern_events.MESSAGE_UPDATED, function(){ setTimeout(refresh, 300); });
+    // Step 2: Wait for data to exist (with timeout)
+    try {
+      if (typeof waitUntil === 'function') {
+        await waitUntil(function() {
+          var d = readData();
+          return d && Object.keys(d).length > 0;
+        }, { timeout: 15000, intervalBetweenAttempts: 300 });
+      }
+    } catch(e) {
+      console.error('StatusBar: waitUntil data failed', e);
     }
-  } catch(e) {}
 
-  setInterval(refresh, 3000);
+    // Step 3: First refresh
+    refresh();
+    // Double-tap in case MVU or TH delay injection
+    setTimeout(function() { refresh(); }, 600);
+    setTimeout(function() { refresh(); }, 1500);
+
+    initDone = true;
+
+    // Step 4: MVU event-driven refresh (primary)
+    try {
+      if (typeof eventOn === 'function' && typeof Mvu !== 'undefined' && Mvu.events) {
+        eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, function() {
+          if (initDone) refresh();
+        });
+        eventOn(Mvu.events.VARIABLE_INITIALIZED, function() {
+          if (initDone) { sig = ''; refresh(); }
+        });
+      }
+    } catch(e) {}
+
+    // Step 5: Tavern events (secondary)
+    try {
+      if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined') {
+        eventOn(tavern_events.MESSAGE_RECEIVED, function() { setTimeout(refresh, 800); });
+        eventOn(tavern_events.MESSAGE_UPDATED, function() { setTimeout(refresh, 400); });
+      }
+    } catch(e) {}
+
+    // Step 6: Fallback polling (safety net)
+    setInterval(function() {
+      if (initDone) refresh();
+    }, 5000);
+  }
+
+  // Start
+  if (typeof $ !== 'undefined') {
+    $(function() { init(); });
+  } else if (document.readyState === 'complete') {
+    init();
+  } else {
+    window.addEventListener('load', init);
+  }
 })();
 </script>
 </body>

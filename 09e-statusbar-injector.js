@@ -16,7 +16,9 @@ function _trace(msg) {
 }
 
 function _readData() {
+  try { if (typeof Mvu !== 'undefined' && Mvu.getMvuData) { var r = Mvu.getMvuData({type:'message',message_id:'latest'}); if (r && r.stat_data && Object.keys(r.stat_data).length>0) return r.stat_data; } } catch(e) {}
   try { if (typeof Mvu !== 'undefined' && Mvu.getMvuData) { var r = Mvu.getMvuData({type:'message',message_id:0}); if (r && r.stat_data && Object.keys(r.stat_data).length>0) return r.stat_data; } } catch(e) {}
+  try { if (typeof getVariables === 'function') { var v = getVariables({type:'message',message_id:'latest'}); if (v && v.stat_data && Object.keys(v.stat_data).length>0) return v.stat_data; } } catch(e) {}
   try { if (typeof getVariables === 'function') { var v = getVariables({type:'message',message_id:0}); if (v && v.stat_data && Object.keys(v.stat_data).length>0) return v.stat_data; } } catch(e) {}
   return null;
 }
@@ -68,7 +70,20 @@ function _tick() {
 
 $(async function() {
   try { if (typeof waitGlobalInitialized === 'function') await waitGlobalInitialized('Mvu'); } catch(e) {}
-  setTimeout(function() { _tick(); _initDone = true; }, 2000);
-  setInterval(function() { if (_initDone) _tick(); }, 2000);
+  try {
+    if (typeof waitUntil === 'function') {
+      await waitUntil(function() { var d = _readData(); return d && Object.keys(d).length > 0; }, { timeout: 15000, intervalBetweenAttempts: 500 });
+    }
+  } catch(e) {}
+  setTimeout(function() { _tick(); _initDone = true; }, 500);
+  setTimeout(function() { if (_initDone) _tick(); }, 1500);
+  // Event-driven refresh
+  try {
+    if (typeof eventOn === 'function' && typeof Mvu !== 'undefined' && Mvu.events) {
+      eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, function() { if (_initDone) _tick(); });
+      eventOn(Mvu.events.VARIABLE_INITIALIZED, function() { if (_initDone) { _curData = {}; _tick(); } });
+    }
+  } catch(e) {}
+  setInterval(function() { if (_initDone) _tick(); }, 3000);
 });
 export {};

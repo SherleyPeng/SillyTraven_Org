@@ -555,12 +555,24 @@ body {
     try {
       if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
         var d = Mvu.getMvuData({ type: 'message', message_id: 'latest' });
-        if (d && d.stat_data) return d.stat_data;
+        if (d && d.stat_data && Object.keys(d.stat_data).length > 0) return d.stat_data;
+      }
+    } catch(e) {}
+    try {
+      if (typeof Mvu !== 'undefined' && Mvu.getMvuData) {
+        var d = Mvu.getMvuData({ type: 'message', message_id: 0 });
+        if (d && d.stat_data && Object.keys(d.stat_data).length > 0) return d.stat_data;
       }
     } catch(e) {}
     try {
       if (typeof getVariables === 'function') {
         var v = getVariables({ type: 'message', message_id: 'latest' });
+        if (v && v.stat_data) return v.stat_data;
+      }
+    } catch(e) {}
+    try {
+      if (typeof getVariables === 'function') {
+        var v = getVariables({ type: 'message', message_id: 0 });
         if (v && v.stat_data) return v.stat_data;
       }
     } catch(e) {}
@@ -912,20 +924,18 @@ body {
   }
 
   async function init() {
-    // Wait for MVU
     try {
       if (typeof waitGlobalInitialized === 'function') {
         await waitGlobalInitialized('Mvu');
       }
     } catch(e) {}
 
-    // Wait for data
     try {
       if (typeof waitUntil === 'function') {
         await waitUntil(async function() {
           var d = await readGameData();
           return d && Object.keys(d).length > 0;
-        }, { timeout: 10000, intervalBetweenAttempts: 200 });
+        }, { timeout: 15000, intervalBetweenAttempts: 300 });
       }
     } catch(e) {}
 
@@ -948,7 +958,15 @@ body {
       if (e.target === this) closeModalFn();
     });
 
-    // Event-based refresh
+    // MVU event-driven refresh (primary)
+    try {
+      if (typeof eventOn === 'function' && typeof Mvu !== 'undefined' && Mvu.events) {
+        eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, function() { refresh(); });
+        eventOn(Mvu.events.VARIABLE_INITIALIZED, function() { refresh(); });
+      }
+    } catch(e) {}
+
+    // Tavern events (secondary)
     try {
       if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined') {
         var refreshTimer = null;
@@ -957,15 +975,19 @@ body {
           refreshTimer = setTimeout(refresh, 300);
         });
         eventOn(tavern_events.MESSAGE_RECEIVED, function() {
-          setTimeout(refresh, 1000);
+          setTimeout(refresh, 800);
         });
       }
     } catch(e) {}
 
-    // Fallback polling
+    // Double-tap refresh for delayed MVU injection
+    setTimeout(function() { refresh(); }, 600);
+    setTimeout(function() { refresh(); }, 2000);
+
+    // Fallback polling (safety net)
     setInterval(function() {
       if (!isRefreshing) refresh();
-    }, 3000);
+    }, 5000);
   }
 
   // Start

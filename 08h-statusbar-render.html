@@ -66,8 +66,11 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   function MF(l,v){return'<div class="mf"><div class="mfl">'+l+'</div><div class="mfv">'+v+'</div></div>';}
 
   function readData(){
+    try{if(typeof Mvu!=='undefined'&&Mvu.getMvuData){var r=Mvu.getMvuData({type:'message',message_id:'latest'});if(r&&r.stat_data&&Object.keys(r.stat_data).length)return r.stat_data;}catch(e){}
+    try{if(typeof Mvu!=='undefined'&&Mvu.getMvuData){var r=Mvu.getMvuData({type:'message',message_id:0});if(r&&r.stat_data&&Object.keys(r.stat_data).length)return r.stat_data;}catch(e){}
     try{var r=getVariables({type:'message'});if(r&&r.stat_data&&Object.keys(r.stat_data).length)return r.stat_data;}catch(e){}
     try{var mid=typeof getCurrentMessageId==='function'?getCurrentMessageId():undefined;var r2=Mvu.getMvuData({type:'message',message_id:mid});if(r2&&r2.stat_data&&Object.keys(r2.stat_data).length)return r2.stat_data;}catch(e){}
+    try{var r=getVariables({type:'message',message_id:'latest'});if(r&&r.stat_data&&Object.keys(r.stat_data).length)return r.stat_data;}catch(e){}
     return last||{};
   }
 
@@ -96,11 +99,15 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   document.getElementById('mdx').addEventListener('click',function(){document.getElementById('md').classList.remove('act')});
   document.getElementById('md').addEventListener('click',function(e){if(e.target===this)this.classList.remove('act')});
 
-  refresh();
-  setInterval(refresh,3000);
-  try{if(typeof eventOn==='function'&&typeof Mvu!=='undefined'&&Mvu.events){eventOn(Mvu.events.VARIABLE_UPDATE_ENDED,function(){refresh()});eventOn(Mvu.events.VARIABLE_INITIALIZED,function(){refresh()});}}catch(e){}
-  try{if(typeof eventOn==='function'&&typeof tavern_events!=='undefined'){eventOn(tavern_events.MESSAGE_RECEIVED,function(){setTimeout(refresh,500)});eventOn(tavern_events.MESSAGE_UPDATED,function(){setTimeout(refresh,300)});}}catch(e){}
-})();
+  (async function(){
+    try{if(typeof waitGlobalInitialized==='function')await waitGlobalInitialized('Mvu');}catch(e){}
+    try{if(typeof waitUntil==='function')await waitUntil(function(){var d=readData();return d&&Object.keys(d).length>0;},{timeout:15000,intervalBetweenAttempts:300});}catch(e){}
+    refresh();
+    setTimeout(function(){refresh();},600);setTimeout(function(){refresh();},2000);
+    setInterval(refresh,5000);
+    try{if(typeof eventOn==='function'&&typeof Mvu!=='undefined'&&Mvu.events){eventOn(Mvu.events.VARIABLE_UPDATE_ENDED,function(){refresh()});eventOn(Mvu.events.VARIABLE_INITIALIZED,function(){refresh()});}}catch(e){}
+    try{if(typeof eventOn==='function'&&typeof tavern_events!=='undefined'){eventOn(tavern_events.MESSAGE_RECEIVED,function(){setTimeout(refresh,800)});eventOn(tavern_events.MESSAGE_UPDATED,function(){setTimeout(refresh,400)});}}catch(e){}
+  })();
 </script>
 </body>
 </html>
