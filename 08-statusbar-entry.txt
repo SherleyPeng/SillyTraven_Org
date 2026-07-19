@@ -1,0 +1,243 @@
+@@iframe 状态栏
+<div id="sb-root">
+<style>
+:root{--bg:#0f0f1a;--glass:rgba(255,255,255,.06);--glass-hover:rgba(255,255,255,.1);--glass-border:rgba(255,255,255,.1);--glass-active:rgba(124,140,248,.25);--text:#e0e0e0;--text-dim:#888;--text-bright:#fff;--accent:#7c8cf8;--danger:#f87171;--warn:#fbbf24;--success:#34d399;--pink:#f472b6;--radius:10px;font-size:13px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.5;overflow:hidden}
+.pnl{display:none}
+.pnl.act{display:block}
+.tab-bar{display:flex;gap:4px;padding:6px;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:10px}
+.tab{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--text-dim);font-size:12px;cursor:pointer;border-radius:8px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:4px}
+.tab:hover{background:var(--glass-hover);color:var(--text)}
+.tab.act{background:var(--accent);color:#fff;font-weight:600;background:rgba(124,140,248,.25);color:var(--accent)}
+.card{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.card-hd{display:flex;justify-content:space-between;margin-bottom:8px}
+.card-t{font-size:13px;font-weight:600;color:var(--text-bright)}
+.card-s{font-size:11px;color:var(--text-dim)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px 12px}
+.f{display:flex;flex-direction:column}
+.fl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+.fv{font-size:13px;color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{background:var(--glass-hover);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text)}
+.txlist{max-height:200px;overflow-y:auto}
+.tx{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.txd{color:var(--text-dim);width:70px;flex-shrink:0}
+.txc{color:var(--text-dim);width:60px;flex-shrink:0;text-align:center}
+.txa{font-weight:600;width:70px;flex-shrink:0;text-align:right}
+.txa.in{color:var(--success)}
+.txa.out{color:var(--danger)}
+.asset{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.asset-v{font-size:16px;font-weight:600;color:var(--text-bright)}
+.time-block{text-align:center;padding:20px 10px}
+.clock{font-size:36px;font-weight:200;color:var(--text-bright);letter-spacing:3px}
+.date{font-size:16px;color:var(--text);margin-top:4px}
+.wday{font-size:13px;color:var(--accent);margin-top:2px}
+.weather{font-size:24px;margin-top:8px}
+.season{font-size:12px;color:var(--text-dim);margin-top:4px}
+.npc{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.15s}
+.npc:hover{background:var(--glass-hover);border-color:rgba(124,140,248,.25)}
+.npc-hd{display:flex;justify-content:space-between}
+.npc-n{font-size:13px;font-weight:600;color:var(--text-bright)}
+.npc-a{font-size:11px;color:var(--text-dim)}
+.npc-m{display:flex;gap:8px;margin-top:4px;font-size:11px;color:var(--text-dim)}
+.npc-st{display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text-dim)}
+.bar-wrap{width:60px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}
+.bar-fill{height:100%;border-radius:2px}
+.bar-fill.aff{background:var(--pink)}
+.bar-fill.obed{background:var(--accent)}
+.phase{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.phase-safe{background:rgba(52,211,153,.2);color:var(--success)}
+.phase-fertile{background:rgba(251,191,36,.2);color:var(--warn)}
+.phase-period{background:rgba(248,113,113,.2);color:var(--danger)}
+.tag{display:inline-block;background:var(--glass-hover);border:1px solid var(--glass-border);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--text-dim);margin:1px}
+.tag.tv{color:var(--success)}
+.tag.tnv{color:var(--warn)}
+.tag.tp{color:var(--danger)}
+.empty{text-align:center;padding:30px 20px;color:var(--text-dim);font-size:13px}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.row-l{color:var(--text-bright);font-weight:600}
+.row-r{color:var(--text-dim)}
+.list{max-height:220px;overflow-y:auto}
+.fold{margin-bottom:6px}
+.fold-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);cursor:pointer;transition:.15s}
+.fold-hd:hover{background:var(--glass-hover)}
+.fold-name{font-size:13px;font-weight:600;color:var(--text-bright)}
+.fold-meta{font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:center}
+.fold-body{display:none;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--glass-border);border-top:none;border-radius:0 0 var(--radius) var(--radius);margin-top:-4px}
+.fold.open .fold-body{display:block}
+.part{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px}
+.part-name{font-size:12px;font-weight:600;color:var(--pink);margin-bottom:6px}
+.part-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:4px 8px}
+.mmf{background:var(--glass);border:1px solid var(--glass-border);border-radius:6px;padding:6px 8px}
+.mmfl{font-size:11px;color:var(--text-dim)}
+.mmfv{font-size:13px;color:var(--text);margin-top:2px}
+.sect{margin-bottom:14px}
+.sect-t{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+</style>
+<div id="sb-panel">
+<div class="tab-bar">
+<button class="tab act" data-t="profile">&#x1F464; 人物</button>
+<button class="tab" data-t="finance">&#x1F4B0; 财务</button>
+<button class="tab" data-t="time">&#x1F550; 时间</button>
+<button class="tab" data-t="relations">&#x1F495; 关系</button>
+</div>
+<div class="pnl act" id="p-profile"></div>
+<div class="pnl" id="p-finance"></div>
+<div class="pnl" id="p-time"></div>
+<div class="pnl" id="p-relations"></div>
+</div>
+</div>
+<script>
+(function(){
+var W={'晴':'\u2600\uFE0F','多云':'\u26C5','阴':'\u2601\uFE0F','雨':'\uD83C\uDF27\uFE0F','雪':'\u2744\uFE0F','雾':'\uD83C\uDF2B\uFE0F','霾':'\uD83C\uDF2B\uFE0F'};
+var Phases={'月经中':{cls:'phase-period',label:'月经中'},'受孕期':{cls:'phase-fertile',label:'受孕期'},'安全期':{cls:'phase-safe',label:'安全期'}};
+function g(o,p,d){if(!o||!p)return d;var k=p.replace(/\[(\d+)\]/g,'.$1').split('.'),c=o;for(var i=0;i<k.length;i++){if(c==null)return d;c=c[k[i]];}return c!=null?c:d;}
+function s(v,d){return(v==null||v==='')?(d||'-'):String(v);}
+function n(v,d){var n=Number(v);return isNaN(n)?(d!=null?String(d):'0'):String(n);}
+function bar(v,m,c){var p=Math.min(100,Math.max(0,(Number(v)||0)/(Number(m)||1)*100));return'<span class="bar-wrap"><span class="bar-fill '+c+'" style="width:'+p+'%"></span></span>'+Math.round(p);}
+function ph(p){var o=Phases[p];return o?'<span class="phase '+o.cls+'">'+o.label+'</span>':s(p);}
+function esc(v){return s(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function rProfile(sd){
+var p=sd.profile||{},bg=p.background||{},st=p.status||{},app=p.appearance||{},inv=p.inventory||[],rels=p.relationships||{},rk=Object.keys(rels);
+var h='<div class="card"><div class="card-hd"><span class="card-t">'+esc(p.name)+'</span><span class="card-s">'+esc(p.occupation)+'</span></div><div class="grid">';
+h+='<div class="f"><span class="fl">性别</span><span class="fv">'+esc(p.gender)+'</span></div>';
+h+='<div class="f"><span class="fl">年龄</span><span class="fv">'+n(p.age)+'岁</span></div>';
+h+='<div class="f"><span class="fl">出生</span><span class="fv">'+n(p.birth_year)+'.'+n(p.birth_month)+'.'+n(p.birth_day)+'</span></div>';
+h+='<div class="f"><span class="fl">外貌</span><span class="fv">'+esc(app.build)+(app.full?', '+esc(app.full):'')+'</span></div>';
+h+='<div class="f"><span class="fl">身体</span><span class="fv">'+esc(st.physical)+'</span></div>';
+h+='<div class="f"><span class="fl">精神</span><span class="fv">'+esc(st.mental)+'</span></div>';
+h+='</div></div>';
+h+='<div class="card"><div class="card-t" style="margin-bottom:6px">背景</div><div class="grid">';
+h+='<div class="f"><span class="fl">家乡</span><span class="fv">'+esc(bg.hometown)+'</span></div>';
+h+='<div class="f"><span class="fl">教育</span><span class="fv">'+esc(bg.education)+'</span></div>';
+h+='<div class="f"><span class="fl">居住</span><span class="fv">'+esc(bg.living)+'</span></div>';
+h+='<div class="f"><span class="fl">求职</span><span class="fv">'+esc(bg.job_status)+'</span></div>';
+h+='</div></div>';
+h+='<div class="card"><div class="card-t" style="margin-bottom:6px">随身物品</div>';
+if(inv.length){h+='<div class="chips">';for(var i=0;i<inv.length;i++)h+='<span class="chip">'+esc(inv[i].name)+(inv[i].desc?' ('+esc(inv[i].desc)+')':'')+'</span>';h+='</div>';}
+else h+='<span class="fl">暂无</span>';
+h+='</div>';
+if(rk.length){h+='<div class="card"><div class="card-t" style="margin-bottom:6px">人际关系</div>';
+for(var ri=0;ri<rk.length;ri++){var r=rels[rk[ri]];h+='<div class="row"><span class="row-l">'+esc(r.name)+'</span><span class="row-r">'+esc(r.relation)+'</span></div>';}
+h+='</div>';}
+return h;
+}
+
+function rFinance(sd){
+var f=sd.finance||{},assets=f.assets||{},txs=f.transactions||[],ak=Object.keys(assets);
+var h='<div class="card"><div class="card-t" style="margin-bottom:8px">资产</div>';
+if(ak.length){for(var i=0;i<ak.length;i++)h+='<div class="asset"><span>'+esc(ak[i])+'</span><span class="asset-v">'+n(assets[ak[i]],'0')+' 元</span></div>';}
+else h+='<span class="fl">暂无</span>';
+h+='</div>';
+if(txs.length){h+='<div class="card"><div class="card-t" style="margin-bottom:6px">最近收支</div><div class="txlist">';
+var st=Math.max(0,txs.length-10);
+for(var ti=st;ti<txs.length;ti++){var tx=txs[ti],inc=tx.type==='收入';h+='<div class="tx"><span class="txd">'+esc(tx.date)+'</span><span class="txc">'+esc(tx.category)+'</span><span class="txa '+(inc?'in':'out')+'">'+(inc?'+':'')+n(tx.amount,'0')+'</span></div>';}
+h+='</div></div>';}
+return h;
+}
+
+function rTime(sd){
+var t=sd.time||{};
+return'<div class="card time-block"><div class="clock">'+String(t.hour||0).padStart(2,'0')+':'+String(t.minute||0).padStart(2,'0')+'</div><div class="date">'+n(t.year)+'年'+n(t.month)+'月'+n(t.day)+'日</div><div class="wday">'+esc(t.weekday)+'</div><div class="weather">'+(W[t.weather]||'')+' '+esc(t.weather)+'</div><div class="season">'+esc(t.season)+'</div></div>';
+}
+
+function rRelations(sd){
+var sexual=sd.sexual||{},male=sd.npc_male||{},sk=Object.keys(sexual),mk=Object.keys(male),h='';
+if(sk.length){h+='<div class="list">';
+for(var i=0;i<sk.length;i++){
+var uid=sk[i],sn=sexual[uid],bp=sn.body_parts||{},br=bp.breasts||{},nip=bp.nipples||{},vag=bp.vagina||{},ut=bp.uterus||{},an=bp.anus||{},mnst=sn.menstrual||{},exp=sn.experience||{};
+h+='<div class="fold" data-uid="'+uid+'"><div class="fold-hd" onclick="this.parentElement.classList.toggle(\'open\')"><span class="fold-name">'+esc(sn.name)+'</span><span class="fold-meta"><span>'+n(sn.age)+'岁</span><span>好感'+bar(sn.affection,100,'aff')+'</span>'+ph(mnst.current_phase||'安全期')+'</span></div>';
+h+='<div class="fold-body">';
+h+='<div class="sect"><div class="sect-t">基本信息</div><div class="grid">';
+h+='<div class="f"><span class="fl">年龄</span><span class="fv">'+n(sn.age)+'岁</span></div>';
+h+='<div class="f"><span class="fl">出生</span><span class="fv">'+n(sn.birth_year)+'.'+n(sn.birth_month)+'.'+n(sn.birth_day)+'</span></div>';
+h+='<div class="f"><span class="fl">处女</span><span class="fv">'+(sn.is_virgin?'是':'否(初夜:'+(sn.first_partner||'?')+')')+'</span></div>';
+h+='<div class="f"><span class="fl">好感</span><span class="fv">'+n(sn.affection)+'</span></div>';
+h+='<div class="f"><span class="fl">服从</span><span class="fv">'+n(sn.obedience)+'</span></div>';
+h+='</div></div>';
+h+='<div class="sect"><div class="sect-t">外貌穿着</div><div class="f"><span class="fl">外貌</span><span class="fv">'+esc(sn.appearance)+'</span></div><div class="f" style="margin-top:4px"><span class="fl">穿着</span><span class="fv">'+esc(sn.outfit)+'</span></div></div>';
+if(sn.personality)h+='<div class="sect"><div class="sect-t">性格</div><div style="font-size:12px;color:#aaa;line-height:1.7">'+esc(sn.personality).replace(/\n/g,'<br>')+'</div></div>';
+h+='<div class="sect"><div class="sect-t">月经</div><div class="grid">';
+h+='<div class="f"><span class="fl">周期</span><span class="fv">'+n(mnst.cycle_length,'28')+'天</span></div>';
+h+='<div class="f"><span class="fl">经期</span><span class="fv">'+n(mnst.period_duration,'5')+'天</span></div>';
+h+='<div class="f"><span class="fl">上次</span><span class="fv">'+esc(mnst.last_period_date)+'</span></div>';
+h+='<div class="f"><span class="fl">当前</span><span class="fv">'+ph(mnst.current_phase||'安全期')+'</span></div>';
+h+='</div></div>';
+h+='<div class="sect"><div class="sect-t">性经验</div><div class="grid">';
+h+='<div class="f"><span class="fl">总计</span><span class="fv">'+n(exp.total)+'次</span></div>';
+h+='<div class="f"><span class="fl">口交</span><span class="fv">'+n(exp.oral)+'次</span></div>';
+h+='<div class="f"><span class="fl">插入</span><span class="fv">'+n(exp.vaginal)+'次</span></div>';
+h+='<div class="f"><span class="fl">肛交</span><span class="fv">'+n(exp.anal)+'次</span></div>';
+h+='<div class="f"><span class="fl">高潮</span><span class="fv">'+n(sn.orgasm_count)+'次</span></div>';
+h+='</div></div>';
+h+='<div class="sect"><div class="sect-t">身体部位</div>';
+h+=bpcard('胸部',[['大小',br.size],['形状',br.shape],['颜色',br.color],['敏感度',br.sensitivity],['状态',br.status]]);
+h+=bpcard('乳头',[['形状',nip.shape],['颜色',nip.color],['乳晕色',nip.areola_color],['乳晕大小',nip.areola_size],['敏感度',nip.sensitivity],['状态',nip.status]]);
+h+=bpcard('小穴',[['形状',vag.shape],['外阴色',vag.color],['内壁色',vag.inner_color],['松紧',vag.tightness],['湿润',vag.wetness],['敏感度',vag.sensitivity],['状态',vag.status]]);
+h+=bpcard('子宫',[['正常',ut.is_normal?'是':'异常'],['怀孕',ut.pregnancy?esc(ut.pregnancy):'无'],['敏感度',ut.sensitivity],['状态',ut.status]]);
+h+=bpcard('肛门',[['形状',an.shape],['颜色',an.color],['松紧',an.tightness],['敏感度',an.sensitivity],['开发',an.is_developed?'是':'未'],['状态',an.status]]);
+h+='</div>';
+var fet=sn.fetishes||[];
+if(fet.length){h+='<div class="sect"><div class="sect-t">性癖</div>';for(var fi=0;fi<fet.length;fi++)h+='<span class="tag">'+esc(fet[fi])+'</span>';h+='</div>';}
+h+='</div></div>';
+}
+h+='</div>';}
+if(mk.length){h+='<div style="margin-top:12px"><div class="card-t" style="margin-bottom:8px;color:#888;font-size:11px">男性 NPC</div></div>';
+for(var mi=0;mi<mk.length;mi++){var mn=male[mk[mi]];h+='<div class="card"><div class="card-hd"><span class="card-t">'+esc(mn.name)+'</span><span class="card-s">'+n(mn.age)+'岁</span></div><div class="grid"><div class="f"><span class="fl">职业</span><span class="fv">'+esc(mn.occupation)+'</span></div><div class="f"><span class="fl">关系</span><span class="fv">'+esc(mn.social_status)+'</span></div></div></div>';}}
+return h||'<div class="empty">暂无 NPC</div>';
+}
+
+function bpcard(name,fields){
+var h='<div class="part"><div class="part-name">'+name+'</div><div class="part-grid">';
+for(var i=0;i<fields.length;i++)h+='<div class="mmf"><div class="mmfl">'+fields[i][0]+'</div><div class="mmfv">'+esc(fields[i][1])+'</div></div>';
+return h+'</div></div>';
+}
+
+async function readData(){
+try{if(typeof Mvu!=='undefined'&&Mvu.getMvuData){var d=Mvu.getMvuData({type:'message',message_id:'latest'});if(d&&d.stat_data)return d.stat_data;}}catch(e){}
+try{if(typeof getVariables==='function'){var v=getVariables({type:'message',message_id:'latest'});if(v&&v.stat_data)return v.stat_data;}}catch(e){}
+return{};
+}
+
+async function refresh(){
+var sd=await readData();
+var pp=document.getElementById('p-profile');
+var pf=document.getElementById('p-finance');
+var pt=document.getElementById('p-time');
+var pr=document.getElementById('p-relations');
+if(pp)pp.innerHTML=rProfile(sd)||'<div class="empty">暂无数据</div>';
+if(pf)pf.innerHTML=rFinance(sd)||'<div class="empty">暂无数据</div>';
+if(pt)pt.innerHTML=rTime(sd)||'<div class="empty">暂无数据</div>';
+if(pr)pr.innerHTML=rRelations(sd)||'<div class="empty">暂无数据</div>';
+}
+
+function init(){
+document.querySelectorAll('.tab').forEach(function(t){
+t.addEventListener('click',function(){
+document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('act');});
+document.querySelectorAll('.pnl').forEach(function(x){x.classList.remove('act');});
+t.classList.add('act');
+var p=document.getElementById('p-'+t.getAttribute('data-t'));
+if(p)p.classList.add('act');
+});
+});
+refresh();
+try{
+if(typeof eventOn==='function'&&typeof tavern_events!=='undefined'){
+var timer=null;
+eventOn(tavern_events.MESSAGE_UPDATED,function(){if(timer)clearTimeout(timer);timer=setTimeout(refresh,500);});
+eventOn(tavern_events.MESSAGE_RECEIVED,function(){setTimeout(refresh,1000);});
+}
+}catch(e){}
+setInterval(refresh,5000);
+}
+
+if(document.readyState==='complete')init();
+else window.addEventListener('load',init);
+})();
+</script>

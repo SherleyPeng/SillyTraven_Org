@@ -1,0 +1,21 @@
+{
+    "info":  "精准诊断：Mvu可用性+消息结构+数据读取",
+    "id":  "diag2-v1",
+    "type":  "script",
+    "data":  {
+
+             },
+    "content":  "$(async function() {\n  var doc = window.parent.document;\n  var lines = [];\n\n  // 1. Check globals\n  lines.push(\u0027Mvu: \u0027 + (typeof window.Mvu !== \u0027undefined\u0027 ? \u0027YES\u0027 : \u0027NO\u0027));\n  lines.push(\u0027getVariables: \u0027 + (typeof window.getVariables === \u0027function\u0027 ? \u0027YES\u0027 : \u0027NO\u0027));\n  lines.push(\u0027waitGlobalInitialized: \u0027 + (typeof window.waitGlobalInitialized === \u0027function\u0027 ? \u0027YES\u0027 : \u0027NO\u0027));\n\n  // 2. Try waitGlobalInitialized\n  try {\n    if (typeof waitGlobalInitialized === \u0027function\u0027) {\n      await waitGlobalInitialized(\u0027Mvu\u0027);\n      lines.push(\u0027Mvu after init: \u0027 + (typeof window.Mvu !== \u0027undefined\u0027 ? \u0027YES\u0027 : \u0027NO\u0027));\n    }\n  } catch(e) { lines.push(\u0027waitGlobalInit ERR: \u0027 + e.message); }\n\n  // 3. Check .mes elements and their children\n  var msgs = doc.querySelectorAll(\u0027.mes\u0027);\n  lines.push(\u0027.mes count: \u0027 + msgs.length);\n  for (var i = 0; i \u003c Math.min(msgs.length, 3); i++) {\n    var m = msgs[i];\n    var hasRobot = m.querySelector(\u0027.fa-robot\u0027);\n    var hasUser = m.querySelector(\u0027.fa-user\u0027);\n    var kids = [];\n    var children = m.querySelectorAll(\u0027*\u0027);\n    for (var j = 0; j \u003c Math.min(children.length, 5); j++) {\n      kids.push(children[j].tagName + (children[j].className ? \u0027.\u0027 + children[j].className.split(\u0027 \u0027)[0] : \u0027\u0027));\n    }\n    lines.push(\u0027  msg[\u0027+i+\u0027] robot=\u0027 + (hasRobot?\u0027Y\u0027:\u0027N\u0027) + \u0027 user=\u0027 + (hasUser?\u0027Y\u0027:\u0027N\u0027) + \u0027 kids=[\u0027 + kids.join(\u0027 \u0027) + \u0027]\u0027);\n  }\n\n  // 4. Where are .fa-robot elements?\n  var robots = doc.querySelectorAll(\u0027.fa-robot\u0027);\n  lines.push(\u0027.fa-robot total: \u0027 + robots.length);\n  for (var k = 0; k \u003c Math.min(robots.length, 3); k++) {\n    var r = robots[k];\n    var inMes = r.closest(\u0027.mes\u0027);\n    lines.push(\u0027  robot[\u0027+k+\u0027] inMes=\u0027 + (inMes?\u0027Y\u0027:\u0027N\u0027) + \u0027 parent=\u0027 + (r.parentElement?r.parentElement.tagName+\u0027.\u0027+r.parentElement.className:\u0027?\u0027));\n  }\n\n  // 5. Try reading data after init\n  try {\n    if (typeof Mvu !== \u0027undefined\u0027 \u0026\u0026 Mvu.getMvuData) {\n      var d = Mvu.getMvuData({ type: \u0027message\u0027, message_id: \u0027latest\u0027 });\n      lines.push(\u0027Mvu.getMvuData: \u0027 + (d ? \u0027GOT \u0027 + JSON.stringify(d).substring(0, 80) : \u0027NULL\u0027));\n    }\n  } catch(e) { lines.push(\u0027getMvuData ERR: \u0027 + e.message); }\n\n  try {\n    if (typeof getVariables === \u0027function\u0027) {\n      var v = getVariables({ type: \u0027message\u0027, message_id: \u0027latest\u0027 });\n      lines.push(\u0027getVariables: \u0027 + (v ? \u0027GOT \u0027 + JSON.stringify(v).substring(0, 80) : \u0027NULL\u0027));\n    }\n  } catch(e) { lines.push(\u0027getVariables ERR: \u0027 + e.message); }\n\n  var el = doc.createElement(\u0027div\u0027);\n  el.style.cssText = \u0027position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,.9);color:#0f0;font:11px monospace;padding:10px;border-radius:4px;max-width:550px;white-space:pre-wrap;max-height:80vh;overflow-y:auto\u0027;\n  el.textContent = lines.join(\u0027\\n\u0027);\n  doc.body.appendChild(el);\n});\nexport {};\n",
+    "button":  {
+                   "buttons":  [
+
+                               ],
+                   "enabled":  false
+               },
+    "name":  "诊断2",
+    "export_with":  {
+                        "button":  true,
+                        "data":  true
+                    },
+    "enabled":  true
+}

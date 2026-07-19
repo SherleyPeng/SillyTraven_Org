@@ -1,0 +1,21 @@
+{
+    "info":  "左上角列出所有匹配到的消息元素类名。",
+    "id":  "dom-diag-v1",
+    "type":  "script",
+    "data":  {
+
+             },
+    "content":  "$(function() {\n  setTimeout(function() {\n    var doc = window.parent.document;\n    var selectors = [\u0027.mes\u0027, \u0027.message\u0027, \u0027.chat-message\u0027, \u0027.msg\u0027, \u0027[class*=\"mes\"]\u0027, \u0027[class*=\"msg\"]\u0027, \u0027[class*=\"Message\"]\u0027, \u0027[data-role]\u0027, \u0027.assistant\u0027];\n    var result = [];\n    for (var i = 0; i \u003c selectors.length; i++) {\n      try {\n        var els = doc.querySelectorAll(selectors[i]);\n        if (els.length) {\n          var classes = [];\n          for (var j = 0; j \u003c Math.min(els.length, 3); j++) {\n            classes.push(els[j].className || \u0027(none)\u0027);\n          }\n          result.push(selectors[i] + \u0027: \u0027 + els.length + \u0027 -\u003e [\u0027 + classes.join(\u0027] [\u0027) + \u0027]\u0027);\n        }\n      } catch(e) { result.push(selectors[i] + \u0027: ERR \u0027 + e.message); }\n    }\n    var el = doc.createElement(\u0027div\u0027);\n    el.style.cssText = \u0027position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,.9);color:#0f0;font:11px monospace;padding:10px;border-radius:4px;max-width:500px;white-space:pre-wrap\u0027;\n    el.textContent = \u0027DOM DIAG:\\n\u0027 + result.join(\u0027\\n\u0027);\n    doc.body.appendChild(el);\n  }, 2000);\n});\nexport {};\n",
+    "button":  {
+                   "buttons":  [
+
+                               ],
+                   "enabled":  false
+               },
+    "name":  "DOM诊断",
+    "export_with":  {
+                        "button":  true,
+                        "data":  true
+                    },
+    "enabled":  true
+}

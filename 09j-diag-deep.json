@@ -1,0 +1,21 @@
+{
+    "info":  "深度诊断：列出所有变量key+递归搜索stat_data",
+    "id":  "diag4-v1",
+    "type":  "script",
+    "data":  {
+
+             },
+    "content":  "$(async function() {\n  var doc = window.parent.document;\n  var lines = [];\n\n  try {\n    if (typeof waitGlobalInitialized === \u0027function\u0027) {\n      await waitGlobalInitialized(\u0027Mvu\u0027);\n    }\n  } catch(e) {}\n\n  // List keys from getVariables() (global scope)\n  try {\n    var gv = getVariables();\n    var gkeys = Object.keys(gv);\n    lines.push(\u0027getVariables() keys(\u0027 + gkeys.length + \u0027):\u0027);\n    var shown = 0;\n    for (var i = 0; i \u003c gkeys.length \u0026\u0026 shown \u003c 20; i++) {\n      var k = gkeys[i];\n      var v = gv[k];\n      var type = typeof v;\n      var preview = \u0027\u0027;\n      if (type === \u0027string\u0027) preview = v.substring(0, 60);\n      else if (type === \u0027object\u0027 \u0026\u0026 v !== null) {\n        if (Array.isArray(v)) preview = \u0027Array[\u0027 + v.length + \u0027]\u0027;\n        else preview = \u0027Object{\u0027 + Object.keys(v).length + \u0027} keys=\u0027 + Object.keys(v).slice(0,5).join(\u0027,\u0027);\n      } else preview = String(v);\n      lines.push(\u0027  \u0027 + k + \u0027: \u0027 + type + \u0027 = \u0027 + preview);\n      shown++;\n    }\n  } catch(e) { lines.push(\u0027getVariables ERR: \u0027 + e.message); }\n\n  // Try Mvu.getMvuData() and check nested keys\n  try {\n    var md = Mvu.getMvuData();\n    var mdkeys = Object.keys(md);\n    lines.push(\u0027Mvu.getMvuData() keys(\u0027 + mdkeys.length + \u0027):\u0027);\n    for (var j = 0; j \u003c mdkeys.length; j++) {\n      var mk = mdkeys[j];\n      var mv = md[mk];\n      if (typeof mv === \u0027object\u0027 \u0026\u0026 mv !== null \u0026\u0026 !Array.isArray(mv)) {\n        var subkeys = Object.keys(mv);\n        lines.push(\u0027  \u0027 + mk + \u0027: Object{\u0027 + subkeys.length + \u0027} [\u0027 + subkeys.slice(0,8).join(\u0027,\u0027) + \u0027]\u0027);\n        if (mv.stat_data) lines.push(\u0027    -\u003e HAS stat_data!\u0027);\n      }\n    }\n  } catch(e) { lines.push(\u0027Mvu ERR: \u0027 + e.message); }\n\n  // Try to find stat_data anywhere\n  function findSD(obj, path, depth) {\n    if (depth \u003e 5 || !obj || typeof obj !== \u0027object\u0027) return;\n    if (Array.isArray(obj)) {\n      for (var i = 0; i \u003c Math.min(obj.length, 3); i++) findSD(obj[i], path + \u0027[\u0027 + i + \u0027]\u0027, depth + 1);\n      return;\n    }\n    var ks = Object.keys(obj);\n    for (var k = 0; k \u003c ks.length; k++) {\n      var key = ks[k];\n      if (key === \u0027stat_data\u0027) {\n        lines.push(\u0027FOUND stat_data at: \u0027 + path + \u0027.\u0027 + key);\n        return;\n      }\n      if (typeof obj[key] === \u0027object\u0027 \u0026\u0026 obj[key] !== null) {\n        findSD(obj[key], path + \u0027.\u0027 + key, depth + 1);\n      }\n    }\n  }\n  findSD(gv, \u0027getVariables\u0027, 1);\n\n  var el = doc.createElement(\u0027div\u0027);\n  el.style.cssText = \u0027position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,.9);color:#0f0;font:11px monospace;padding:10px;border-radius:4px;max-width:600px;white-space:pre-wrap;max-height:85vh;overflow-y:auto\u0027;\n  el.textContent = lines.join(\u0027\\n\u0027);\n  doc.body.appendChild(el);\n});\nexport {};\n",
+    "button":  {
+                   "buttons":  [
+
+                               ],
+                   "enabled":  false
+               },
+    "name":  "诊断4",
+    "export_with":  {
+                        "button":  true,
+                        "data":  true
+                    },
+    "enabled":  true
+}

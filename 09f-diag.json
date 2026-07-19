@@ -1,0 +1,21 @@
+{
+    "info":  "最小诊断：在页面右上角显示蓝色标签。不显示=脚本执行模型本身有问题。",
+    "id":  "diag-test-v1",
+    "type":  "script",
+    "data":  {
+
+             },
+    "content":  "$(function() {\n  try {\n    var doc = window.parent.document;\n    var div = doc.createElement(\u0027div\u0027);\n    div.id = \u0027sb-diag\u0027;\n    div.textContent = \u0027状态栏脚本已运行 ✓\u0027;\n    div.style.cssText = \u0027background:#7c8cf8;color:#fff;padding:8px 16px;position:fixed;top:10px;right:10px;z-index:99999;border-radius:6px;font-size:14px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,.3)\u0027;\n    doc.body.appendChild(div);\n  } catch(e) {\n    var d2 = window.parent.document.createElement(\u0027div\u0027);\n    d2.textContent = \u0027ERR: \u0027 + e.message;\n    d2.style.cssText = \u0027background:red;color:#fff;padding:10px;position:fixed;top:10px;right:10px;z-index:99999;\u0027;\n    window.parent.document.body.appendChild(d2);\n  }\n});\nexport {};\n",
+    "button":  {
+                   "buttons":  [
+
+                               ],
+                   "enabled":  false
+               },
+    "name":  "诊断",
+    "export_with":  {
+                        "button":  true,
+                        "data":  true
+                    },
+    "enabled":  true
+}

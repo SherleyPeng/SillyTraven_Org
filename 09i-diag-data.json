@@ -1,0 +1,21 @@
+{
+    "info":  "测试各种读数据方式+检查.mes的data属性",
+    "id":  "diag3-v1",
+    "type":  "script",
+    "data":  {
+
+             },
+    "content":  "$(async function() {\n  var doc = window.parent.document;\n  var lines = [];\n\n  try {\n    if (typeof waitGlobalInitialized === \u0027function\u0027) {\n      await waitGlobalInitialized(\u0027Mvu\u0027);\n      lines.push(\u0027Mvu ready: YES\u0027);\n    }\n  } catch(e) { lines.push(\u0027init ERR: \u0027 + e.message); }\n\n  // Try different ways to read data\n  var tests = [\n    [\u0027Mvu.getMvuData()\u0027, function() { return Mvu.getMvuData(); }],\n    [\u0027Mvu.getMvuData(\"latest\")\u0027, function() { return Mvu.getMvuData(\u0027latest\u0027); }],\n    [\u0027Mvu.getMvuData({type:\"message\",message_id:-1})\u0027, function() { return Mvu.getMvuData({type:\u0027message\u0027,message_id:-1}); }],\n    [\u0027Mvu.getMvuData({type:\"message\",message_id:0})\u0027, function() { return Mvu.getMvuData({type:\u0027message\u0027,message_id:0}); }],\n    [\u0027Mvu.getMvuData({type:\"message\",message_id:1})\u0027, function() { return Mvu.getMvuData({type:\u0027message\u0027,message_id:1}); }],\n    [\u0027getVariables()\u0027, function() { return getVariables(); }],\n    [\u0027getVariables({type:\"message\"})\u0027, function() { return getVariables({type:\u0027message\u0027}); }],\n    [\u0027getVariables({type:\"chat\"})\u0027, function() { return getVariables({type:\u0027chat\u0027}); }]\n  ];\n\n  for (var i = 0; i \u003c tests.length; i++) {\n    try {\n      var result = tests[i][1]();\n      if (result \u0026\u0026 typeof result === \u0027object\u0027) {\n        var keys = Object.keys(result);\n        var hasSD = result.stat_data ? \u0027HAS stat_data\u0027 : \u0027NO stat_data\u0027;\n        lines.push(tests[i][0] + \u0027: keys=\u0027 + keys.length + \u0027 \u0027 + hasSD);\n        if (keys.length \u0026\u0026 keys.length \u003c= 10) lines.push(\u0027  keys: [\u0027 + keys.join(\u0027, \u0027) + \u0027]\u0027);\n      } else {\n        lines.push(tests[i][0] + \u0027: \u0027 + JSON.stringify(result));\n      }\n    } catch(e) { lines.push(tests[i][0] + \u0027: ERR \u0027 + e.message); }\n  }\n\n  // Check .mes for any distinguishing class\n  var msgs = doc.querySelectorAll(\u0027.mes\u0027);\n  for (var j = 0; j \u003c Math.min(msgs.length, 3); j++) {\n    var m = msgs[j];\n    lines.push(\u0027mes[\u0027+j+\u0027] classes=\u0027 + (m.className||\u0027(none)\u0027) + \u0027 data-attrs=\u0027 + Array.from(m.attributes).filter(function(a){return a.name.startsWith(\u0027data-\u0027);}).map(function(a){return a.name+\u0027=\u0027+a.value;}).join(\u0027 \u0027));\n  }\n\n  var el = doc.createElement(\u0027div\u0027);\n  el.style.cssText = \u0027position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,.9);color:#0f0;font:11px monospace;padding:10px;border-radius:4px;max-width:550px;white-space:pre-wrap;max-height:80vh;overflow-y:auto\u0027;\n  el.textContent = lines.join(\u0027\\n\u0027);\n  doc.body.appendChild(el);\n});\nexport {};\n",
+    "button":  {
+                   "buttons":  [
+
+                               ],
+                   "enabled":  false
+               },
+    "name":  "诊断3",
+    "export_with":  {
+                        "button":  true,
+                        "data":  true
+                    },
+    "enabled":  true
+}
