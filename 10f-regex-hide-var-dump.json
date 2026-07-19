@@ -1,0 +1,10 @@
+{
+  "scriptName": "隐藏纯文本变量dump行",
+  "findRegex": "/^(?:当前时间:|用户档案\\s+姓名:|数值状态\\s+体力:|言灵记录\\s+\\()[^\\n]*$/gm",
+  "replaceString": "",
+  "placement": [2],
+  "markdownOnly": true,
+  "promptOnly": false,
+  "disabled": false,
+  "runOnEdit": true
+}

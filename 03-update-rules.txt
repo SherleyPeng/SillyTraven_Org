@@ -16,39 +16,47 @@
   - 用 markdown 围栏包裹 JSON
   - 整对象覆盖(改单字段只 patch 该字段)
   - JSON 注释
-  - 无变化时省略容器(必须输出 [])
+  - 跳过UpdateVariable容器——即使本轮无任何变量变化，也必须输出完整容器，JSONPatch数组为空 []。不可省略 <UpdateVariable> 和 <JSONPatch> 标签
 
 §1 完整 schema 树
 
 stat_data:
+  location: string  # 当前精确位置, 如"海淀区学院路火星时代校外宿舍3号楼502室"
+
   time: 封闭
     year: number, month: number, day: number
     hour: number, minute: number
     weekday: string, weather: string, season: string
 
-  profile: 封闭
-    name: string       # 彭少镭
-    gender: string     # 男
-    age: number
-    birth_year: number   # 1994
-    birth_month: number  # 12
-    birth_day: number    # 21
-    occupation: string
-    personality: string  # 性格描述长文本
-    appearance: 封闭
-      build: string
-      full: string
-    status: 封闭
-      physical: string
-      mental: string
-    inventory: Array<{ name: string, desc?: string }>
-    background: 封闭
-      hometown: string
-      education: string
-      living: string
-      job_status: string
-    relationships: 半开放 字典容器 key=rel_NNN
-      value: { name, relation, status, notes }
+   profile: 封闭
+     name: string       # 彭少镭
+     gender: string     # 男
+     age: number
+     birth_year: number   # 1994
+     birth_month: number  # 12
+     birth_day: number    # 21
+     occupation: string
+     personality: string  # 性格描述长文本
+     appearance: 封闭
+       build: string
+       full: string
+     status: 封闭
+       physical: string
+       mental: string
+     stats: 封闭
+       physical: number(0~100)  # 体力
+       mental: number(0~100)    # 精神
+       fatigue: number(0~100)   # 疲劳
+       hunger: number(0~100)    # 饱腹
+       hygiene: number(0~100)   # 卫生
+     inventory: Array<{ name: string, desc?: string }>
+     background: 封闭
+       hometown: string
+       education: string
+       living: string
+       job_status: string
+     relationships: 半开放 字典容器 key=rel_NNN
+       value: { name, relation, status, notes }
 
   finance: 封闭
     assets: 半开放 catchall(number)  key=账户名(中文)
@@ -57,13 +65,26 @@ stat_data:
   sexual: 半开放 字典容器 key=char_NNN  value=完整女性NPC数据
     女性NPC结构详见 §A
 
-  npc_male: 半开放 字典容器 key=mnpc_NNN
-    value: { name, age, occupation, social_status }
+   npc_male: 半开放 字典容器 key=mnpc_NNN
+     value: { name, age, occupation, social_status }
 
-  _uid_counters: 封闭 只读
-    relationship: number
-    sexual_char: number
-    npc_male: number
+   connections: Array<{ id(string), from(string), to(string), relation(string) }>
+
+   calendar_events: Array<{ date(string YYYY-MM-DD), title, type }>
+
+   wechat: 半开放 字典容器 key=联系人名(中文)
+     value: { name, messages: Array<{ from, text, time }> }
+
+   weibo: 封闭
+     posts: Array<{ title, summary, category, time, source }>
+
+   kotodama: 封闭
+     records: Array<{ id(number), time(string), command(string), result(string), active(boolean) }>
+
+   _uid_counters: 封闭 只读
+     relationship: number
+     sexual_char: number
+     npc_male: number
 
 §A 女性NPC完整结构
 
@@ -90,13 +111,16 @@ sexual.<char_uid>:
 
 §2 路径反例
 
-  /time/时钟        -> /time/hour
-  /profile/长相     -> /profile/appearance/full
-  /profile/家乡     -> /profile/background/hometown
-  /finance/余额     -> /finance/assets/建设银行存款
-  /sexual/张三      -> /sexual/char_001  (名字写进name字段)
-  /npc_male/李四    -> /npc_male/mnpc_001
-  /sexual/char_001/hp -> 不存在此字段, 想加状态写 status 字段
+   /time/时钟        -> /time/hour
+   /location/咖啡馆  -> /location  (直接replace整个字符串)
+   /profile/长相     -> /profile/appearance/full
+   /profile/家乡     -> /profile/background/hometown
+   /profile/体力值   -> /profile/stats/physical
+   /finance/余额     -> /finance/assets/建设银行存款
+   /sexual/张三      -> /sexual/char_001  (名字写进name字段)
+   /npc_male/李四    -> /npc_male/mnpc_001
+   /sexual/char_001/hp -> 不存在此字段, 想加状态写 status 字段
+   /kotodama/第一条  -> /kotodama/records/-  (数组追加)
 
 §3 类型一致性
 
@@ -120,6 +144,7 @@ period_duration: >=1, 默认5
 经验计数(total/oral/vaginal/anal): >=0
 orgasm_count: >=0
 _uid_counters.*: >=0
+stats.*: 0~100(physical/mental/fatigue/hunger/hygiene)
 
 §5 Enum 字段
 
@@ -165,6 +190,7 @@ C 联动同步: 改时间->同步星期+月经相位, 新实体->计数器+1
 D 不整对象 replace: 改单字段只 patch 目标路径, 不改上级对象
 E 剧情-变量同步: 正文出现的会复现的实体, 变量里必须有
 F 反流水账: 存的必须是"明天还成立"的状态(见 §9 语义类型表)
+G 言灵门控: kotodama 写入前确认 {{user}} 明确以"使用言灵/言灵:"等前缀触发
 
 §8 UID 规范
 
@@ -251,3 +277,120 @@ finance.transactions: 保留最近50条, 超限删除最早的
 禁止删除:
   - 已被建档的角色条目(除非角色死亡或永久离开舞台)
   - _uid_counters 的任何字段
+
+§13 言灵记录规则
+
+13.1 触发门控（硬门——不满足此条件绝不记录）
+
+  kotodama.records 仅在以下条件**全部满足**时写入:
+    A. {{user}}在内心明确以"使用言灵"为意图前缀
+       例: "使用言灵——让这杯水变成咖啡"
+       例: "言灵: 窗外开始下雪"
+       例: "我要用言灵让..."
+    B. 该意图指向一个具体的、可验证的现实改变
+    C. 改变的生效/失败/部分生效在本轮正文中得到确认
+
+  以下情况**绝不**记录为言灵:
+    - 普通愿望/期盼("希望能找到工作""好想吃火锅")
+    - 内心os/吐槽/日常念头("这把键盘真难用")
+    - 情绪反应("我真想揍他"——除非明确以言灵方式使用)
+    - {{user}}的正常行动/决定/选择
+    - 对未来的预测或推理(那是先知能力，不是言灵)
+
+13.2 新建记录
+
+  新言灵记录 add 到 /kotodama/records/-:
+    id: 基于已有 records 数量递增, 从 1 开始
+    time: 当前 /time 时间, 格式 "YYYY-MM-DD HH:MM"
+    command: {{user}}言灵的具体内容(原句或精炼表述)
+    result: 此生效果描述(如"成功——中行卡余额变为一亿元")
+    active: true
+
+13.3 撤销记录
+
+  当{{user}}明确使用言灵撤销/取消之前的某项言灵效果时:
+    - 将对应记录的 active 改为 false(replace 操作)
+    - 在 result 末尾追加 " | 于 YYYY-MM-DD HH:MM 撤销"
+    - 不删除记录, 不改变 id
+
+  当新言灵的效果与旧言灵不可共存时(如先让天晴再让下雨):
+    - 旧记录自动 active=false, result 追加 " | 被后续言灵覆盖"
+
+13.4 输出前自检(言灵专项)
+
+  A 触发门控: {{user}}是否明确以"使用言灵"开头?
+  B 效果确认: 正文中是否体现了现实改变?
+  C 不可共存检查: 新效果是否与现有 active 记录冲突?
+
+§14 数值状态更新规则
+
+14.1 字段范围
+
+  /profile/stats:
+    physical: 0~100  # 体力——消耗于体力活动, 恢复于休息/睡眠/进食
+    mental:   0~100  # 精神——消耗于压力/高强度思考/社交, 恢复于放松/睡眠/愉悦事件
+    fatigue:  0~100  # 疲劳——随时间/活动增长, 睡眠后重置
+    hunger:   0~100  # 饱腹——随时间下降, 进食后回升
+    hygiene:  0~100  # 卫生——随时间/运动下降, 洗漱/沐浴后回升
+
+14.2 更新时机
+
+  不要求每轮对话都更新。仅在以下情况触发:
+    - 场景发生明显的时间推进(跨小时)
+    - 发生了消耗/恢复性的行动(运动/进食/睡眠/洗澡/高强度工作)
+    - 状态变化幅度>=5 时才 patch
+
+14.3 典型变化量参考
+
+  体力:
+    轻微活动(走路/聊天): -0~5
+    中等劳动(搬东西/长时间站立): -5~15
+    高强度运动(跑步/重体力): -10~30
+    睡眠/充分休息: +20~40
+  精神:
+    轻微用脑(日常对话): -0~3
+    高专注(建模/学习/面试): -5~15
+    情绪冲击(好消息/坏消息/冲突): ±5~20
+    放松/听音乐/散步: +5~10
+    睡眠: +15~30
+  疲劳:
+    每经过约 1 小时清醒: +3~8
+    体力消耗大时额外: +5~10
+    睡眠: 重置为 5~15
+    短暂休息/小憩: -10~20
+  饱腹:
+    每经过约 2~3 小时: -5~10
+    正常一餐: +25~40
+    零食: +5~10
+  卫生:
+    每经过约 4~6 小时: -3~5
+    运动/出汗后额外: -5~10
+    洗漱/淋浴: +30~50
+    换衣服: +10~15
+
+14.4 禁止
+
+  禁止超出 0~100 范围
+  禁止不根据剧情凭空调整数值
+  禁止在无实际活动变化的对话轮次中机械更新所有五项
+
+§15 位置追踪规则
+
+15.1 字段
+
+  /location: string  当前精确位置
+
+15.2 更新时机
+
+  {{user}}移动到新地点时立即 replace:
+    - 进入建筑物: "海淀区学院路XX银行ATM自助区"
+    - 进入店铺: "王府井百货大楼3层男装区"
+    - 回到住所: "火星时代校外宿舍楼3号楼502室"
+    - 在交通工具上: "学院路上一辆伊兰特出租车内"
+
+15.3 精度要求
+
+  必须包含可辨识的地标/建筑名/房间号, 不能只写城市名
+  正确: "朝阳区金融街丽思卡尔顿酒店大堂"
+  错误: "北京" / "酒店" / "外面"
+  如果不知道精确地址, 用可见参照物: "学院路某银行ATM隔间"

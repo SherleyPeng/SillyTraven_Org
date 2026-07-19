@@ -9,18 +9,24 @@ var m = stat.npc_male || {};
 var r = p.relationships || {};
 var assets = f.assets || {};
 var txs = f.transactions || [];
+var stats = p.stats || {};
+var kd = stat.kotodama || {};
+var kdRecs = kd.records || [];
 var rKeys = Object.keys(r);
 var mKeys = Object.keys(m);
 var sKeys = Object.keys(s);
 var aKeys = Object.keys(assets);
 %>
 当前时间: <%- t.year %>年<%- t.month %>月<%- t.day %>日 <%- t.weekday %> <%- String(t.hour).padStart(2,'0') %>:<%- String(t.minute).padStart(2,'0') %>    天气: <%- t.weather %>    季节: <%- t.season %>
+位置: <%- stat.location || '未知' %>
 
 用户档案  姓名: <%- p.name %>  年龄: <%- p.age %>岁  出生: <%- p.birth_year %>.<%- p.birth_month %>.<%- p.birth_day %>  性别: <%- p.gender %>  职业: <%- p.occupation %>
   外貌: <%- p.appearance.build || '' %><% if (p.appearance.full) { %>; <%- p.appearance.full %><% } %>
   状态: 身体[<%- p.status.physical || '' %>] 精神[<%- p.status.mental || '' %>]
   性格: <%- p.personality || '未详述' %>
   背景: <%- p.background.hometown || '' %> | <%- p.background.education || '' %> | <%- p.background.living || '' %> | <%- p.background.job_status || '' %>
+
+数值状态  体力: <%- stats.physical!=null ? stats.physical : '?' %>  精神: <%- stats.mental!=null ? stats.mental : '?' %>  疲劳: <%- stats.fatigue!=null ? stats.fatigue : '?' %>  饱腹: <%- stats.hunger!=null ? stats.hunger : '?' %>  卫生: <%- stats.hygiene!=null ? stats.hygiene : '?' %>
 
 随身物品:
 <% if (p.inventory && p.inventory.length) { for (var i=0; i<p.inventory.length; i++) { var item = p.inventory[i]; %>
@@ -41,6 +47,11 @@ var aKeys = Object.keys(assets);
 <% if (rKeys.length) { for (var ri=0; ri<rKeys.length; ri++) { var rel = r[rKeys[ri]]; %>
   [<%- rKeys[ri] %>] <%- rel.name %>  关系: <%- rel.relation %>  状态: <%- rel.status %><% if (rel.notes) { %>  备注: <%- rel.notes %><% } %>
 <% } } else { %>  (暂无)<% } %>
+
+言灵记录 (<%- kdRecs.length %>条)
+<% if (kdRecs.length) { for (var ki=0; ki<kdRecs.length; ki++) { var kr = kdRecs[ki]; %>
+  #<%- kr.id %> <%- kr.time || '?' %> <%- kr.command %> → <%- kr.result %> (<%- kr.active ? '生效' : '已撤销' %>)
+<% } } else { %>  (尚未使用言灵)<% } %>
 
 男性NPC (<%- mKeys.length %>人)
 <% if (mKeys.length) { for (var mi=0; mi<mKeys.length; mi++) { var mn = m[mKeys[mi]]; %>

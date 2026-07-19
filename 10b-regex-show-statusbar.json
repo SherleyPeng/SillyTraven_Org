@@ -1,6 +1,6 @@
 {
   "scriptName": "状态栏显示(StatusBar+StatusPlaceHolderImpl)",
-  "findRegex": "/<Status(?:Bar|PlaceHolderImpl)\\/>/gm",
+  "findRegex": "/<Status(?:Bar|PlaceHolderImpl)\\/>/m",
   "replaceString": "```html\n<body>\n<script>\n$('body').load('https://sherleypeng.github.io/SillyTraven_Org/07-statusbar-iphone.html')\n</script>\n</body>\n```",
   "placement": [
     2

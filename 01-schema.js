@@ -1,5 +1,7 @@
-// ═══ RealWorld 角色卡 Schema v1.0 ═══
+// ═══ RealWorld 角色卡 Schema v1.1 ═══
 // v1.0: 初版——时间天气 / 角色档案 / 经济 / 色色系统(5部位细拆) / NPC男简档 / UID计数器
+// v1.1: 新增 profile.stats(体力精神疲劳饱腹卫生) / kotodama言灵 / wechat微信 / weibo微博 / connections人脉 / calendar_events日历
+// v1.1.1: 修复变量更新forcer——UpdateVariable块改为强制输出(不可因"无变化"跳过)
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
@@ -54,6 +56,13 @@ const ProfileSchema = z.object({
   status: z.object({
     physical: str('健康'),
     mental:   str('正常')
+  }).default({}).catch({}),
+  stats: z.object({
+    physical: pct.default(80),
+    mental:   pct.default(75),
+    fatigue:  pct.default(45),
+    hunger:   pct.default(65),
+    hygiene:  pct.default(80)
   }).default({}).catch({}),
   inventory: z.array(InventoryItemSchema).default([]).catch([]),
   background: z.object({
@@ -184,14 +193,79 @@ const MaleNPCSchema = z.object({
 }).default({}).catch({});
 
 // ═══════════════════════════════
+// 言灵记录
+// ═══════════════════════════════
+const KotodamaRecordSchema = z.object({
+  id:      num,
+  time:    str(),
+  command: str(),
+  result:  str(),
+  active:  bool(true)
+}).default({}).catch({});
+
+// ═══════════════════════════════
+// 微信
+// ═══════════════════════════════
+const WeChatMessageSchema = z.object({
+  from: str(),
+  text: str(),
+  time: str()
+}).default({}).catch({});
+
+const WeChatContactSchema = z.object({
+  name:     str(),
+  messages: z.array(WeChatMessageSchema).default([]).catch([])
+}).default({}).catch({});
+
+// ═══════════════════════════════
+// 微博
+// ═══════════════════════════════
+const WeiboPostSchema = z.object({
+  title:    str(),
+  summary:  str(),
+  category: str(),
+  time:     str(),
+  source:   str()
+}).default({}).catch({});
+
+// ═══════════════════════════════
+// 人脉图谱
+// ═══════════════════════════════
+const ConnectionSchema = z.object({
+  id:       str(),
+  from:     str(),
+  to:       str(),
+  relation: str()
+}).default({}).catch({});
+
+// ═══════════════════════════════
+// 日历事件
+// ═══════════════════════════════
+const CalendarEventSchema = z.object({
+  date:  str(),
+  title: str(),
+  type:  str()
+}).default({}).catch({});
+
+// ═══════════════════════════════
 // 顶层 Schema
 // ═══════════════════════════════
 export const Schema = z.object({
+  location: str('北京火星时代校外宿舍'),
   time:    TimeSchema,
   profile: ProfileSchema,
   finance: FinanceSchema,
   sexual:   z.object({}).catchall(FemaleNPCSchema).default({}).catch({}),
   npc_male: z.object({}).catchall(MaleNPCSchema).default({}).catch({}),
+  connections:      z.array(ConnectionSchema).default([]).catch([]),
+  calendar_events:  z.array(CalendarEventSchema).default([]).catch([]),
+  wechat:   z.object({}).catchall(WeChatContactSchema).default({}).catch({}),
+  weibo:    z.object({
+    posts: z.array(WeiboPostSchema).default([]).catch([])
+  }).default({}).catch({}),
+  kotodama: z.object({
+    records: z.array(KotodamaRecordSchema).default([]).catch([])
+  }).default({}).catch({}),
   _uid_counters: z.object({
     relationship: num,
     sexual_char:  num,

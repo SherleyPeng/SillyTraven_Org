@@ -177,7 +177,7 @@ document.getElementById('h-weekday').textContent=S(t.weekday);
 document.getElementById('h-date').textContent=N(t.month)+'月'+N(t.day)+'日';
 document.getElementById('ww-icon').textContent=WI[t.weather]||'☀️';
 document.getElementById('ww-temp').textContent=S(t.weather);
-document.getElementById('ww-desc').textContent=S(t.season)+' · 北京';
+document.getElementById('ww-desc').textContent=S(sd.location)||(S(t.season)+' · 北京');
 updDock(st);
 SH('body-profile',rProfile(sd));SH('body-bank',rBank(sd));SH('body-calendar',rCalendar(sd));SH('body-contacts',rContacts(sd));SH('body-connections',rConnections(sd));SH('body-lover',rLover(sd));SH('body-wechat',rWeChat(sd));SH('body-weibo',rWeibo(sd));SH('body-kotodama',rKotodama(sd));
 SB('bg-lover',Object.keys(sd.sexual||{}).length);SB('bg-wechat',Object.keys(sd.wechat||{}).length);SB('bg-weibo',((sd.weibo||{}).posts||[]).length);

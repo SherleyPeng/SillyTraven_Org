@@ -1,3 +1,5 @@
+location: 北京火星时代校外宿舍
+
 time:
   year: 2013
   month: 12
@@ -23,6 +25,12 @@ profile:
   status:
     physical: 健康
     mental: 正常
+  stats:
+    physical: 80
+    mental: 75
+    fatigue: 45
+    hunger: 65
+    hygiene: 80
   inventory:
     - name: 索尼Xperia P手机
       desc: 粉色
@@ -44,6 +52,18 @@ finance:
 sexual: {}
 
 npc_male: {}
+
+connections: []
+
+calendar_events: []
+
+wechat: {}
+
+weibo:
+  posts: []
+
+kotodama:
+  records: []
 
 _uid_counters:
   relationship: 0

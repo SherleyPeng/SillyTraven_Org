@@ -1,1 +1,14 @@
-在每次你的回复末尾，**必须**另起一行输出 <StatusPlaceHolderImpl/>。这是系统硬件要求，无论剧情进行到什么阶段都必须执行。不要省略、不要解释、不要用其他文字代替。
+硬性系统要求：每次回复必须包含一个状态栏占位符。
+
+回复中必须恰好出现一次以下结构，严格按此顺序：
+
+1. 剧情正文
+2. 恰好一个 <UpdateVariable><JSONPatch>[...]</JSONPatch></UpdateVariable> 块
+   ——即使本轮无变化也必须输出空数组 []，不可输出第二个
+3. <StatusPlaceHolderImpl/>（独占最后一行）
+
+铁律：
+- 全篇回复中只允许出现一个 <UpdateVariable> 块。如果预设或思考链已生成过一个，绝不再生成第二个
+- <JSONPatch> 内 kotodama 记录使用 add，但必须先检查：若 command 文本与已有记录完全相同，跳过不 add
+- <StatusPlaceHolderImpl/> 必须是回复最后一行，之后无任何内容
+- 无论剧情阶段如何，以上步骤不可省略、不可解释、不可用其他文字代替

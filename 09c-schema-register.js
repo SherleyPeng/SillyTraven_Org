@@ -48,6 +48,13 @@ const ProfileSchema = z.object({
     physical: str('健康'),
     mental:   str('正常')
   }).default({}).catch({}),
+  stats: z.object({
+    physical: pct.default(80),
+    mental:   pct.default(75),
+    fatigue:  pct.default(45),
+    hunger:   pct.default(65),
+    hygiene:  pct.default(80)
+  }).default({}).catch({}),
   inventory: z.array(InventoryItemSchema).default([]).catch([]),
   background: z.object({
     hometown:   str('吉林省某小镇'),
@@ -208,6 +215,7 @@ const CalendarEventSchema = z.object({
 }).default({}).catch({});
 
 const Schema = z.object({
+  location: str('北京火星时代校外宿舍'),
   time:    TimeSchema,
   profile: ProfileSchema,
   finance: FinanceSchema,
