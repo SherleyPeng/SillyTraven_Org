@@ -167,6 +167,14 @@ const MaleNPCSchema = z.object({
   social_status: str()
 }).default({}).catch({});
 
+
+const KotodamaRecordSchema = z.object({
+  id:      num,
+  time:    str(),
+  command: str(),
+  result:  str(),
+  active:  bool(true)
+}).default({}).catch({});
 const WeChatMessageSchema = z.object({
   from: str(),
   text: str(),
@@ -195,6 +203,9 @@ const Schema = z.object({
   wechat:   z.object({}).catchall(WeChatContactSchema).default({}).catch({}),
   weibo:    z.object({
     posts: z.array(WeiboPostSchema).default([]).catch([])
+  }).default({}).catch({}),
+  kotodama: z.object({
+    records: z.array(KotodamaRecordSchema).default([]).catch([])
   }).default({}).catch({}),
   _uid_counters: z.object({
     relationship: num,
