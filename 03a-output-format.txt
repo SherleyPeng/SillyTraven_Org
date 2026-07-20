@@ -1,24 +1,29 @@
 §0 输出格式
 
-容器:
-  open_tag:  <UpdateVariable>
-  inner_tag: <JSONPatch>
-  payload:   一个 JSONPatch 数组
-  close_tag: </JSONPatch></UpdateVariable>
+你必须输出变量更新。每轮回复必须包含以下容器，即使没有任何变化也要输出空数组 []。
+
+输出模板（直接复制该结构，无变化时用 []）：
+<UpdateVariable><JSONPatch>
+[
+  { "op": "replace", "path": "/...", "value": ... }
+]
+</JSONPatch></UpdateVariable>
 
 操作:
-  add:     { op: "add",     path: "/...", value: ... }
-  replace: { op: "replace", path: "/...", value: ... }
-  remove:  { op: "remove",  path: "/..." }
+  add:     { "op": "add",     "path": "/...", "value": ... }
+  replace: { "op": "replace", "path": "/...", "value": ... }
+  remove:  { "op": "remove",  "path": "/..." }
+
+⚠️ 容器写入规则: sexual properties vehicles companies finance/accounts profile/relationships npc_male wechat 这些容器不支持 add/remove 单个 key，必须用 replace 整个父容器。示例: { "op": "replace", "path": "/sexual", "value": { "char_001": {...} } }
 
 禁止:
-  - ⛔ 在 <UpdateVariable> 与 <JSONPatch> 之间插入任何其他标签（尤其是 <Analysis>）——只允许直接内嵌 <JSONPatch>
-  - ⛔ 输出 <Analysis> 标签——该标签由独立系统生成，你输出会导致 MVU 解析失败、数据丢失
+  - 在 <UpdateVariable> 与 <JSONPatch> 之间插入任何标签或文字——<JSONPatch> 必须紧跟在 <UpdateVariable> 后面，中间不能有 <Analysis> 或任何其他内容
+  - 输出 <Analysis> 标签——绝对禁止，会直接导致变量存储失败
   - 用 add 操作向数组末尾追加元素(会被执行两次造成重复)——应 replace 完整数组
   - 用 markdown 围栏包裹 JSON
   - 整对象覆盖(改单字段只 patch 该字段)
   - JSON 注释
-  - 无变化时省略容器(必须输出 [])
+  - 省略容器——即使无变量变化也必须输出 <UpdateVariable><JSONPatch>[]</JSONPatch></UpdateVariable>
 
 
 

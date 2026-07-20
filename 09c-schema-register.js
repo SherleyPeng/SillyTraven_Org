@@ -30,7 +30,7 @@ const ProfileSchema = z.object({
   wealth: str('普通'),
   inventory: z.array(InventoryItemSchema).default([]).catch([]),
   background: z.object({ hometown: str('吉林省某小镇'), education: str('高一休学 → 高三入北京火星时代学3D建模 → 2013.11毕业'), living: str('与同学合租火星时代校外宿舍楼，月租400元'), job_status: str('投递数十份简历，未获面试') }).default({}).catch({}),
-  relationships: z.object({}).catchall(RelationshipSchema).default({}).catch({})
+  relationships: z.record(RelationshipSchema).default({}).catch({})
 }).default({}).catch({});
 
 // ── Finance v2: cash + accounts(UID) ──
@@ -47,7 +47,7 @@ const TransactionSchema = z.object({
 
 const FinanceSchema = z.object({
   cash: num.default(200),
-  accounts: z.object({}).catchall(AccountSchema).default({}).catch({}),
+  accounts: z.record(AccountSchema).default({}).catch({}),
   transactions: z.array(TransactionSchema).default([]).catch([])
 }).default({}).catch({});
 
@@ -117,15 +117,15 @@ const Schema = z.object({
   time:    TimeSchema,
   profile: ProfileSchema,
   finance: FinanceSchema,
-  properties:       z.object({}).catchall(PropertySchema).default({}).catch({}),
-  vehicles:         z.object({}).catchall(VehicleSchema).default({}).catch({}),
-  companies:        z.object({}).catchall(CompanySchema).default({}).catch({}),
+  properties:       z.record(PropertySchema).default({}).catch({}),
+  vehicles:         z.record(VehicleSchema).default({}).catch({}),
+  companies:        z.record(CompanySchema).default({}).catch({}),
   company_holdings: z.array(CompanyHoldingSchema).default([]).catch([]),
-  sexual:   z.object({}).catchall(FemaleNPCSchema).default({}).catch({}),
-  npc_male: z.object({}).catchall(MaleNPCSchema).default({}).catch({}),
+  sexual:   z.record(FemaleNPCSchema).default({}).catch({}),
+  npc_male: z.record(MaleNPCSchema).default({}).catch({}),
   connections:      z.array(ConnectionSchema).default([]).catch([]),
   calendar_events:  z.array(CalendarEventSchema).default([]).catch([]),
-  wechat:   z.object({}).catchall(WeChatContactSchema).default({}).catch({}),
+  wechat:   z.record(WeChatContactSchema).default({}).catch({}),
   weibo:    z.object({ posts: z.array(WeiboPostSchema).default([]).catch([]) }).default({}).catch({}),
   kotodama: z.object({ records: z.array(KotodamaRecordSchema).default([]).catch([]) }).default({}).catch({}),
   _uid_counters: z.object({
