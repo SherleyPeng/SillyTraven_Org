@@ -31,6 +31,7 @@ profile:
     fatigue: 45
     hunger: 65
     hygiene: 80
+  wealth: 普通
   inventory:
     - name: 索尼Xperia P手机
       desc: 粉色

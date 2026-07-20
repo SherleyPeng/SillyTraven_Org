@@ -26,6 +26,7 @@ const ProfileSchema = z.object({
   appearance: z.object({ build: str('清秀偏瘦'), full: str() }).default({}).catch({}),
   status: z.object({ physical: str('健康'), mental: str('正常') }).default({}).catch({}),
   stats: z.object({ physical: pct.default(80), mental: pct.default(75), fatigue: pct.default(45), hunger: pct.default(65), hygiene: pct.default(80) }).default({}).catch({}),
+  wealth: str('普通'),
   inventory: z.array(InventoryItemSchema).default([]).catch([]),
   background: z.object({ hometown: str('吉林省某小镇'), education: str('高一休学 → 高三入北京火星时代学3D建模 → 2013.11毕业'), living: str('与同学合租火星时代校外宿舍楼，月租400元'), job_status: str('投递数十份简历，未获面试') }).default({}).catch({}),
   relationships: z.object({}).catchall(RelationshipSchema).default({}).catch({})

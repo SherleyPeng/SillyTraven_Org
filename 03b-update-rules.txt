@@ -33,7 +33,7 @@ stat_data:
       fatigue: number(0~100, 越高越累)
       hunger: number(0~100, 越低越饿)
       hygiene: number(0~100)
-      wealth_status: string(普通/宽裕/富裕/巨富)
+      wealth: string(普通/宽裕/富裕/巨富)
     relationships: 半开放 字典容器 key=rel_NNN
       value: { name, relation, status, notes }
 
@@ -312,7 +312,7 @@ finance.transactions: 保留最近50条, 超限删除最早的
   hunger<=20: status.physical改为"饥饿"
   hygiene<=30: NPC可能注意到异味
 
-wealth_status根据finance.assets自动判定:
+wealth根据总资产自动判定(写入/profile/wealth):
   总资产<1万: 普通
   1万~100万: 宽裕
   100万~1亿: 富裕
