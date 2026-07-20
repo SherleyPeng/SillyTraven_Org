@@ -7,7 +7,7 @@ var f = stat.finance || {};
 var s = stat.sexual || {};
 var m = stat.npc_male || {};
 var r = p.relationships || {};
-var assets = f.assets || {};
+var accts = f.accounts || {};
 var txs = f.transactions || [];
 var stats = p.stats || {};
 var kd = stat.kotodama || {};
@@ -15,7 +15,10 @@ var kdRecs = kd.records || [];
 var rKeys = Object.keys(r);
 var mKeys = Object.keys(m);
 var sKeys = Object.keys(s);
-var aKeys = Object.keys(assets);
+var aKeys = Object.keys(accts);
+var props = stat.properties || {};
+var vehs = stat.vehicles || {};
+var comps = stat.companies || {};
 %>
 当前时间: <%- t.year %>年<%- t.month %>月<%- t.day %>日 <%- t.weekday %> <%- String(t.hour).padStart(2,'0') %>:<%- String(t.minute).padStart(2,'0') %>    天气: <%- t.weather %>    季节: <%- t.season %>
 位置: <%- stat.location || '未知' %>
@@ -34,13 +37,29 @@ var aKeys = Object.keys(assets);
 <% } } else { %>  (无)<% } %>
 
 财务
-<% if (aKeys.length) { for (var ai=0; ai<aKeys.length; ai++) { %>
-  <%- aKeys[ai] %>: <%- assets[aKeys[ai]] %>元
-<% } } else { %>  (无资产记录)<% } %>
+现金: <%- f.cash!=null ? f.cash : 200 %>元
+<% if (aKeys.length) { for (var ai=0; ai<aKeys.length; ai++) { var acct = accts[aKeys[ai]]; %>
+  [<%- aKeys[ai] %>] <%- acct.bank || '?' %> <%- acct.type || '?' %>: <%- acct.balance!=null ? acct.balance : '0' %>元
+<% } } else { %>  (无银行账户)<% } %>
 <% if (txs.length) { %>
   最近收支 (<%- Math.min(txs.length, 10) %>条):
 <% for (var ti=Math.max(0, txs.length-10); ti<txs.length; ti++) { var tx = txs[ti]; %>
-  <%- tx.date %> <%- tx.type %> <%- tx.amount %>元 [<%- tx.account %>] <%- tx.category %><% if (tx.note) { %> "<%- tx.note %>"<% } %>
+  <%- tx.date %> <%- tx.direction || tx.type || '?' %> <%- tx.amount %>元 [<%- tx.account %>] <%- tx.category %><% if (tx.note) { %> "<%- tx.note %>"<% } %>
+<% } } %>
+
+<% var pKeys = Object.keys(props); if (pKeys.length) { %>房产 (<%- pKeys.length %>处)
+<% for (var pi=0; pi<pKeys.length; pi++) { var prop = props[pKeys[pi]]; %>
+  [<%- pKeys[pi] %>] <%- prop.name || '?' %> | <%- prop.property_type %> | <%- prop.ownership %> | <%- prop.address || '?' %> | 面积<%- prop.area_sqm||0 %>㎡ | 市值<%- prop.current_value||0 %>元<% if (prop.monthly_payment) { %> | 月供<%- prop.monthly_payment %>元<% } %>
+<% } } %>
+
+<% var vKeys = Object.keys(vehs); if (vKeys.length) { %>车辆 (<%- vKeys.length %>辆)
+<% for (var vi=0; vi<vKeys.length; vi++) { var veh = vehs[vKeys[vi]]; %>
+  [<%- vKeys[vi] %>] <%- veh.brand || '?' %> <%- veh.model || '' %> (<%- veh.year || '?' %>) | <%- veh.vehicle_type %> | <%- veh.ownership %> | 车牌<%- veh.plate || '?' %> | 市值<%- veh.current_value||0 %>元
+<% } } %>
+
+<% var cKeys = Object.keys(comps); if (cKeys.length) { %>公司 (<%- cKeys.length %>家)
+<% for (var ci=0; ci<cKeys.length; ci++) { var comp = comps[cKeys[ci]]; %>
+  [<%- cKeys[ci] %>] <%- comp.name || '?' %> | <%- comp.company_type %> | <%- comp.industry || '?' %> | <%- comp.status %> | 持股<%- comp.ownership_pct||0 %>% | 估值<%- comp.total_value||0 %>元
 <% } } %>
 
 人际关系 (<%- rKeys.length %>人)

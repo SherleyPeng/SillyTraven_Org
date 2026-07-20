@@ -44,10 +44,22 @@ profile:
   relationships: {}
 
 finance:
-  assets:
-    现金: 200
-    建设银行存款: 800
+  cash: 200
+  accounts:
+    acct_001:
+      bank: 建设银行
+      type: 储蓄卡
+      balance: 800
+      note: ""
   transactions: []
+
+properties: {}
+
+vehicles: {}
+
+companies: {}
+
+company_holdings: []
 
 sexual: {}
 
@@ -69,3 +81,7 @@ _uid_counters:
   relationship: 0
   sexual_char: 0
   npc_male: 0
+  account: 1
+  property: 0
+  vehicle: 0
+  company: 0
