@@ -65,7 +65,7 @@ var aKeys = Object.keys(assets);
   穿着: <%- sn.outfit || '?' %>
   性格: <%- sn.personality || '?' %>
   处女: <%- sn.is_virgin ? '是' : '否(初夜:'+(sn.first_partner||'?')+')' %>
-  好感: <%- sn.affection %>  服从: <%- sn.obedience %>
+  友情: <%- sn.friendship!=null ? sn.friendship : '0' %>  恋爱: <%- sn.romance!=null ? sn.romance : '0' %>  憎恨: <%- sn.hatred!=null ? sn.hatred : '0' %>  服从: <%- sn.obedience!=null ? sn.obedience : '0' %>
   月经: <%- mnst.current_phase || '?' %> (周期<%- mnst.cycle_length||28 %>天/经期<%- mnst.period_duration||5 %>天/上次<%- mnst.last_period_date||'?' %>)
   性经验(总计): <%- exp.total||0 %>次 口<%- exp.oral||0 %> 阴<%- exp.vaginal||0 %> 肛<%- exp.anal||0 %>
   与主角: <%- eu.total||0 %>次 口<%- eu.oral||0 %> 阴<%- eu.vaginal||0 %> 肛<%- eu.anal||0 %>  高潮: <%- sn.orgasm_count||0 %>
