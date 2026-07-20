@@ -59,7 +59,7 @@ var aKeys = Object.keys(assets);
 <% } } else { %>  (暂无)<% } %>
 
 女性NPC (<%- sKeys.length %>人)
-<% if (sKeys.length) { for (var si=0; si<sKeys.length; si++) { var sn = s[sKeys[si]]; var bp = sn.body_parts || {}; var br = bp.breasts || {}; var nip = bp.nipples || {}; var vag = bp.vagina || {}; var ut = bp.uterus || {}; var an = bp.anus || {}; var mnst = sn.menstrual || {}; var exp = sn.experience || {}; %>
+<% if (sKeys.length) { for (var si=0; si<sKeys.length; si++) { var sn = s[sKeys[si]]; var bp = sn.body_parts || {}; var br = bp.breasts || {}; var nip = bp.nipples || {}; var vag = bp.vagina || {}; var ut = bp.uterus || {}; var an = bp.anus || {}; var mnst = sn.menstrual || {}; var exp = sn.experience || {}; var eu = sn.experience_with_user || {}; %>
   [<%- sKeys[si] %>] <%- sn.name %>  <%- sn.age %>岁  <%- sn.birth_year %>.<%- sn.birth_month %>.<%- sn.birth_day %>
   外貌: <%- sn.appearance || '?' %>
   穿着: <%- sn.outfit || '?' %>
@@ -67,7 +67,8 @@ var aKeys = Object.keys(assets);
   处女: <%- sn.is_virgin ? '是' : '否(初夜:'+(sn.first_partner||'?')+')' %>
   好感: <%- sn.affection %>  服从: <%- sn.obedience %>
   月经: <%- mnst.current_phase || '?' %> (周期<%- mnst.cycle_length||28 %>天/经期<%- mnst.period_duration||5 %>天/上次<%- mnst.last_period_date||'?' %>)
-  性经验: 总计<%- exp.total||0 %> 口<%- exp.oral||0 %> 阴<%- exp.vaginal||0 %> 肛<%- exp.anal||0 %>  高潮: <%- sn.orgasm_count||0 %>
+  性经验(总计): <%- exp.total||0 %>次 口<%- exp.oral||0 %> 阴<%- exp.vaginal||0 %> 肛<%- exp.anal||0 %>
+  与主角: <%- eu.total||0 %>次 口<%- eu.oral||0 %> 阴<%- eu.vaginal||0 %> 肛<%- eu.anal||0 %>  高潮: <%- sn.orgasm_count||0 %>
   部位:
      胸: <%- br.size||'?' %> <%- br.shape||'?' %> 色<%- br.color||'?' %> 敏<%- br.sensitivity||'?' %> <%- br.status||'?' %>
      乳头: <%- nip.shape||'?' %> 色<%- nip.color||'?' %> 晕<%- nip.areola_color||'?' %>(<%- nip.areola_size||'?' %>) 敏<%- nip.sensitivity||'?' %> <%- nip.status||'?' %>

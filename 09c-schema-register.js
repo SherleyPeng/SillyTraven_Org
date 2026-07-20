@@ -149,6 +149,13 @@ const ExperienceSchema = z.object({
   anal:    num
 }).default({}).catch({});
 
+const ExperienceWithUserSchema = z.object({
+  total:   num,
+  oral:    num,
+  vaginal: num,
+  anal:    num
+}).default({}).catch({});
+
 const FemaleNPCSchema = z.object({
   name:          str(),
   age:           num,
@@ -163,7 +170,8 @@ const FemaleNPCSchema = z.object({
   menstrual:     MenstrualSchema,
   affection:     pct,
   obedience:     pct,
-  experience:    ExperienceSchema,
+  experience:             ExperienceSchema,
+  experience_with_user:   ExperienceWithUserSchema,
   orgasm_count:  num,
   body_parts:    BodyPartsSchema,
   fetishes:      z.array(z.string()).default([]).catch([])
