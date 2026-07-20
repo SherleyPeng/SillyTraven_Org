@@ -1,7 +1,10 @@
-// ═══ RealWorld 角色卡 Schema v1.1 ═══
+// ═══ RealWorld 角色卡 Schema v1.2.2 ═══
 // v1.0: 初版——时间天气 / 角色档案 / 经济 / 色色系统(5部位细拆) / NPC男简档 / UID计数器
 // v1.1: 新增 profile.stats(体力精神疲劳饱腹卫生) / kotodama言灵 / wechat微信 / weibo微博 / connections人脉 / calendar_events日历
 // v1.1.1: 修复变量更新forcer——UpdateVariable块改为强制输出(不可因"无变化"跳过)
+// v1.2.0: InitVar对齐source、修复observer事件源、加固正则、EJS补calendar_events、加loader错误处理
+// v1.2.1: 变量输出格式/更新规则拆分(仿灯火)、去除叙事AI的UpdateVariable指令防双写、去重脚本升级模糊匹配
+// v1.2.2: 修复schema注册脚本缺失7个新字段(导致状态栏数据被strip)——关键bug修复
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 

@@ -1,0 +1,43 @@
+§0 输出格式
+
+容器:
+  open_tag:  <UpdateVariable>
+  inner_tag: <JSONPatch>
+  payload:   一个 JSONPatch 数组
+  close_tag: </JSONPatch></UpdateVariable>
+
+操作:
+  add:     { op: "add",     path: "/...", value: ... }
+  replace: { op: "replace", path: "/...", value: ... }
+  remove:  { op: "remove",  path: "/..." }
+
+禁止:
+  - 用 add 操作向数组末尾追加元素(会被执行两次造成重复)——应 replace 完整数组
+  - 用 markdown 围栏包裹 JSON
+  - 整对象覆盖(改单字段只 patch 该字段)
+  - JSON 注释
+  - 无变化时省略容器(必须输出 [])
+
+
+
+路径格式警告：路径必须以 / 开头。
+§2 路径反例（额外警告：路径必须以 / 开头，如 /time/hour。绝对禁止在路径前加 stat_data. 前缀——/stat_data/time/hour 是错误的，会导致数据写入嵌套位置而丢失。）
+
+§3 类型一致性
+
+数字: 不带引号, 不带千位分隔符, 小数字不用科学计数法
+   200   "200"   "1,200"   2e2
+布尔: 仅 true / false, 不用 "是"/"否"/"1"/"0"
+   true   "是"   "false"(带引号)
+字符串: 必须带引号
+数组: 用 [] 包裹, 不用顿号串
+   ["tag1", "tag2"]   "tag1, tag2"
+null: 不带引号
+   null   "null"   "无"
+
+
+
+§5 Enum 字段
+
+current_phase: 仅限 "月经中" / "安全期" / "受孕期"
+   "排卵期" "经期" "危险期" "黄体期" -> 必须用上述三者之一

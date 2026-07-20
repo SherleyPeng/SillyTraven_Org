@@ -1,5 +1,7 @@
 import { registerMvuSchema } from 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';
 
+// RealWorld Schema v1.2.0 (register for MVU pipeline)
+
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
 const num   = z.coerce.number().transform(v => Math.max(0, v)).default(0).catch(0);

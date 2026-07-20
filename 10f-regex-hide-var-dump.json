@@ -1,10 +1,10 @@
 {
   "scriptName": "隐藏纯文本变量dump行",
-  "findRegex": "/^(?:当前时间:|用户档案\\s+姓名:|数值状态\\s+体力:|言灵记录\\s+\\()[^\\n]*$/gm",
+  "findRegex": "/^(?:当前时间:|用户档案\\s+姓名:|数值状态\\s+体力:|言灵记录\\s+\\(|人际关系\\s+\\(|男性NPC\\s+\\(|女性NPC\\s+\\(|微信消息:|微博热搜:|人脉图谱:|近期事件:|随身物品:|财务|最近收支\\s+\\()[^\\n]*$/gm",
   "replaceString": "",
   "placement": [2],
   "markdownOnly": true,
   "promptOnly": false,
-  "disabled": false,
+  "disabled": true,
   "runOnEdit": true
 }

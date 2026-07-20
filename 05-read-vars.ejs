@@ -69,12 +69,17 @@ var aKeys = Object.keys(assets);
   月经: <%- mnst.current_phase || '?' %> (周期<%- mnst.cycle_length||28 %>天/经期<%- mnst.period_duration||5 %>天/上次<%- mnst.last_period_date||'?' %>)
   性经验: 总计<%- exp.total||0 %> 口<%- exp.oral||0 %> 阴<%- exp.vaginal||0 %> 肛<%- exp.anal||0 %>  高潮: <%- sn.orgasm_count||0 %>
   部位:
-    胸: <%- br.size||'?' %> <%- br.shape||'?' %> 色<%- br.color||'?' %> 敏<%- br.sensitivity||'?' %> <%- br.status||'?' %>
-    乳头: <%- nip.shape||'?' %> 色<%- nip.color||'?' %> 晕<%- nip.areola_color||'?' %>(<%- nip.areola_size||'?' %>) 敏<%- nip.sensitivity||'?' %> <%- nip.status||'?' %>
-    小穴: <%- vag.shape||'?' %> 色<%- vag.color||'?' %> 内色<%- vag.inner_color||'?' %> 紧<%- vag.tightness||'?' %> 湿<%- vag.wetness||'?' %> 敏<%- vag.sensitivity||'?' %> <%- vag.status||'?' %>
-    子宫: <%- ut.is_normal ? '正常' : '异常' %><% if (ut.pregnancy) { %> 孕[<%- ut.pregnancy %>]<% } %> 敏<%- ut.sensitivity||'?' %> <%- ut.status||'?' %>
-    肛门: <%- an.is_developed ? '已开发' : '未开发' %> 色<%- an.color||'?' %> 紧<%- an.tightness||'?' %> 敏<%- an.sensitivity||'?' %> <%- an.status||'?' %>
+     胸: <%- br.size||'?' %> <%- br.shape||'?' %> 色<%- br.color||'?' %> 敏<%- br.sensitivity||'?' %> <%- br.status||'?' %>
+     乳头: <%- nip.shape||'?' %> 色<%- nip.color||'?' %> 晕<%- nip.areola_color||'?' %>(<%- nip.areola_size||'?' %>) 敏<%- nip.sensitivity||'?' %> <%- nip.status||'?' %>
+     小穴: <%- vag.shape||'?' %> 色<%- vag.color||'?' %> 内色<%- vag.inner_color||'?' %> 紧<%- vag.tightness||'?' %> 湿<%- vag.wetness||'?' %> 敏<%- vag.sensitivity||'?' %> <%- vag.status||'?' %>
+     子宫: <%- ut.is_normal ? '正常' : '异常' %><% if (ut.pregnancy) { %> 孕[<%- ut.pregnancy %>]<% } %> 敏<%- ut.sensitivity||'?' %> <%- ut.status||'?' %>
+     肛门: <%- an.is_developed ? '已开发' : '未开发' %> 色<%- an.color||'?' %> 紧<%- an.tightness||'?' %> 敏<%- an.sensitivity||'?' %> <%- an.status||'?' %>
   性癖: <%- (sn.fetishes||[]).join(',') || '(无)' %>
+<% } } else { %>  (暂无)<% } %>
+
+近期事件 (<%- (stat.calendar_events||[]).length %>条)
+<% var evts = stat.calendar_events || []; var now = String(t.year || 2013) + '-' + String(t.month || 12).padStart(2,'0') + '-' + String(t.day || 14).padStart(2,'0'); var upcoming = evts.filter(function(ev){ return ev.date && ev.date >= now }).slice(0, 5); if (upcoming.length) { for (var ei = 0; ei < upcoming.length; ei++) { var ev = upcoming[ei]; %>
+  <%- ev.date %> <%- ev.title || '?' %> (<%- ev.type || '?' %>)
 <% } } else { %>  (暂无)<% } %>
 
 <% } %>

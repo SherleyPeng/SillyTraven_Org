@@ -1,0 +1,306 @@
+§1 完整 schema 树
+
+stat_data:
+  time: 封闭
+    year: number, month: number, day: number
+    hour: number, minute: number
+    weekday: string, weather: string, season: string
+
+  profile: 封闭
+    name: string       # 彭少镭
+    gender: string     # 男
+    age: number
+    birth_year: number   # 1994
+    birth_month: number  # 12
+    birth_day: number    # 21
+    occupation: string
+    personality: string  # 性格描述长文本
+    appearance: 封闭
+      build: string
+      full: string
+    status: 封闭
+      physical: string
+      mental: string
+    inventory: Array<{ name: string, desc?: string }>
+    background: 封闭
+      hometown: string
+      education: string
+      living: string
+      job_status: string
+    stats: 封闭
+      physical: number(0~100)
+      mental: number(0~100)
+      fatigue: number(0~100, 越高越累)
+      hunger: number(0~100, 越低越饿)
+      hygiene: number(0~100)
+      wealth_status: string(普通/宽裕/富裕/巨富)
+    relationships: 半开放 字典容器 key=rel_NNN
+      value: { name, relation, status, notes }
+
+  finance: 封闭
+    assets: 半开放 catchall(number)  key=账户名(中文)
+    transactions: Array<{ date, amount(可负), type(收入/支出), account, category, note }>
+
+  sexual: 半开放 字典容器 key=char_NNN  value=完整女性NPC数据
+    女性NPC结构详见 §A
+
+  npc_male: 半开放 字典容器 key=mnpc_NNN
+    value: { name, age, occupation, social_status }
+
+
+  wechat: 半开放 字典容器 key=联系人或uid
+    value: { name: string, messages: Array<{ from: string, text: string, time: string }> }
+
+  weibo: 封闭
+    posts: Array<{ title: string, summary: string, category: enum(科技/娱乐/时政/社会), time: string, source: string }>
+
+  kotodama: 封闭
+    records: Array<{ id: number, time: string, command: string, result: string, active: boolean }>
+
+  connections: 数组
+    value: { id: string, from: string, to: string, relation: string }
+
+  calendar_events: 数组
+    value: { date: string(YYYY-MM-DD), title: string, type: string }
+
+  _uid_counters: 封闭 只读
+    relationship: number
+    sexual_char: number
+    npc_male: number
+
+§A 女性NPC完整结构
+
+sexual.<char_uid>:
+  name: string, age: number
+  birth_year: number, birth_month: number, birth_day: number
+  appearance: string, outfit: string, personality: string
+  is_virgin: boolean, first_partner: string|null
+  menstrual: 封闭
+    cycle_length: number(默认28), period_duration: number(默认5)
+    last_period_date: string("YYYY-MM-DD")
+    current_phase: enum(月经中/安全期/受孕期, 默认安全期)
+  affection: number(0~100), obedience: number(0~100)
+  experience: 封闭
+    total: number, oral: number, vaginal: number, anal: number
+  orgasm_count: number
+  body_parts: 封闭
+    breasts:  { size, shape, color, sensitivity, status }
+    nipples:  { shape, color, areola_color, areola_size, sensitivity, status }
+    vagina:   { shape, color, inner_color, tightness, wetness, sensitivity, status }
+    uterus:   { is_normal(boolean), pregnancy(string|null), sensitivity, status }
+    anus:     { shape, color, tightness, sensitivity, is_developed(boolean), status }
+  fetishes: string[]
+
+§2 路径反例（额外警告：路径必须以 / 开头，如 /time/hour。绝对禁止在路径前加 stat_data. 前缀——/stat_data/time/hour 是错误的，会导致数据写入嵌套位置而丢失。）
+
+  /time/时钟        -> /time/hour
+  /profile/长相     -> /profile/appearance/full
+  /profile/家乡     -> /profile/background/hometown
+  /finance/余额     -> /finance/assets/建设银行存款
+  /sexual/张三      -> /sexual/char_001  (名字写进name字段)
+  /npc_male/李四    -> /npc_male/mnpc_001
+  /sexual/char_001/hp -> 不存在此字段, 想加状态写 status 字段
+
+§4 数值范围
+
+affection: 0~100, 初始=0
+obedience: 0~100, 初始=0
+age: >=0, 真实年龄
+cycle_length: >=1, 默认28
+period_duration: >=1, 默认5
+经验计数(total/oral/vaginal/anal): >=0
+orgasm_count: >=0
+_uid_counters.*: >=0
+
+§6 联动规则
+
+6.1 时间推进联动
+  更新 /time/day -> 必须同步更新 /time/weekday
+  更新 /time/month -> 需检查是否跨月, 跨月重置 day=1
+  更新 /time/year  -> 需检查是否跨年, 跨年重置 month=1
+  改任何时间字段 -> 更新所有女性NPC的 menstrual.current_phase
+
+6.2 月经相位计算
+  根据 /time 当前日期 与 NPC.last_period_date 的差值计算:
+    差值 = 当前日期 - last_period_date(to days)
+    phase_day = 差值 % cycle_length
+    若 phase_day < period_duration  -> "月经中"
+    若 period_duration <= phase_day < period_duration + 6(估算受孕窗口) -> "受孕期"
+    否则 -> "安全期"
+  时间推进时必须对所有 sexual.*.menstrual 执行此计算
+
+6.3 UID计数器联动
+  新建 /sexual/char_NNN -> /_uid_counters/sexual_char +1
+  新建 /npc_male/mnpc_NNN -> /_uid_counters/npc_male +1
+  新建 /profile/relationships/rel_NNN -> /_uid_counters/relationship +1
+
+6.4 首次性行为联动
+  女性NPC首次 vaginal/oral/anal 经验从0变为正数:
+    is_virgin -> false(若原本true)
+    若 first_partner 为 null -> 设为 {{user}}名字
+
+6.5 计数联动
+  发生性行为 -> experience.对应类型+1, experience.total+1
+  达到高潮 -> orgasm_count+1
+
+§7 输出前自检
+
+A 路径合法: 每段路径在 §1 schema 树中存在, key 用 UID 格式, 没漏中间层
+B 类型范围: 数字无引号/不越界, bool 非"是否", pct 0~100 内
+C 联动同步: 改时间->同步星期+月经相位, 新实体->计数器+1
+D 不整对象 replace: 改单字段只 patch 目标路径, 不改上级对象
+E 剧情-变量同步: 正文出现的会复现的实体, 变量里必须有
+F 反流水账: 存的必须是"明天还成立"的状态(见 §9 语义类型表)
+
+§8 UID 规范
+
+格式: 前缀_NNN (三位数字序号, 从001开始)
+前缀表:
+  char_  -> 女性NPC (sexual)
+  mnpc_ -> 男性NPC (npc_male)
+  rel_  -> 人际关系 (profile.relationships)
+
+闭环:
+  1. 按名字扫描全库: 检查是否已有同名人
+  2. 命中: update(不新建), 不增计数器
+  3. 未命中: 读计数器 -> 计数器+1 -> add 新记录
+
+禁止: key含英文句点 / 用名字做key / 重复UID
+
+§9 建档门槛
+
+不建档(负面清单):
+  - 未报真名
+  - 功能性过场(收银员/路人/司机)
+  - 本轮即离场不再出现
+  - {{user}}的父母/亲戚/直系血亲
+
+建档(正面清单):
+  - 报出真名 + 有实质互动
+  - 明确会再登场
+  - {{user}}表现出深入互动意图
+
+男性NPC建档: 一次填满 { name, age, occupation, social_status }
+  social_status 描述与{{user}}当前社交关系, 如"室友/火星时代同学/求职同行"
+
+女性NPC建档: 一次填满全部字段(§A全部), 不写占位符/"待定"/空串
+  未知字段填基于已有信息的合理推断值, 如:
+    年龄 -> 根据外貌/职业推断
+    身体部位 -> 根据体型/年龄/着装风格合理描写
+    月经 -> 使用默认值(cycle=28, duration=5, phase=安全期)
+    性经验 -> 全0, is_virgin=true, first_partner=null(默认)
+
+§10 名人数据参考规则
+
+当故事中出现现实名人时:
+
+10.1 基础数据(必须真实):
+  姓名, 出生日期, 年龄: 与公开资料严格一致
+  籍贯, 职业, 经历: 以该时间点(当前故事日期)的真实状态为准
+  例: 2013年12月出现刘亦菲-> 26岁, 已出演《仙剑奇侠传》《神雕侠侣》
+      尚未出演《花木兰》(那是2020年)
+
+10.2 身体数据(尽量真实):
+  身高, 三围等: 查阅公开资料, 无法获取时据照片/视频合理推断
+
+10.3 色色数据(合理虚构):
+  无法从公开资料获取的私密信息(is_virgin/first_partner/性经验/部位状态):
+  据人物公众形象、年龄、公开感情史合理虚构
+
+10.4 处女状态默认规则:
+  默认 is_virgin = true, 以下情况除外:
+    - 该名人在当前时间线有明确的公开男友/丈夫(含已婚/离婚状态)
+    - 有公开报道承认的过往恋爱关系
+    - 有子女
+  满足除外条件时, is_virgin = false, first_partner 设为已知对象姓名或据公开信息合理推断
+
+10.5 禁止虚构八卦:
+  禁止使用搜索引擎查不到的、未经公开报道证实的花边新闻、绯闻、私密传闻
+  禁止编造该名人从未被公开报道的恋情或性经历
+  personality 字段中的虚构部分必须标注"基于公开形象虚构"
+
+§11 反流水账约束
+
+命中的高危字段:
+  personality: 存角色性格的抽象描述, 不存/追加具体行为事例
+  appearance/outfit: 存当前外在形象的静态描述, 不含位置/动作/事件
+  status(physical/mental): 每轮完全 replace, 只写当前瞬态
+  fetishes: 添加时写抽象性癖名(如"被支配"), 不写具体场景事件
+
+判别: 每次写入前自问"这条明天还成立吗？"
+
+§12 清理规则
+
+finance.transactions: 保留最近50条, 超限删除最早的
+其余字段: 无滚动窗口上限, 由叙事自然管理
+
+禁止删除:
+  - 已被建档的角色条目(除非角色死亡或永久离开舞台)
+  - _uid_counters 的任何字段
+
+
+
+
+§15 言灵记录规则
+
+当玩家使用言灵能力改变现实后，记录此次使用:
+  写入路径: replace /kotodama/records 为完整数组(含新增记录)
+  新增记录格式: { id: 自增序号(从1开始), time: "YYYY-MM-DD HH:MM", command: "言灵指令原文", result: "实际产生的结果", active: true }
+  id 必须自增(max_id+1)，不可重复
+
+撤销言灵(玩家逆转某次言灵效果):
+  只做两件事:
+    1. replace /kotodama/records/<该记录索引>/active 为 false
+    2. 如果该言灵修改过其他字段(如财务/时间/物品)，对这些字段做精确的反向replace——只改该言灵影响过的那个字段，不动其他任何字段
+  绝对禁止:
+    将整个 finance.assets 或任何父级对象整体 replace 回初始值
+    触碰未被该条言灵影响过的字段
+    用 InitVar 的初始值覆盖当前值
+
+撤销示例(正确): 撤销"余额变1亿"这条言灵
+  → replace /kotodama/records/0/active 为 false
+  → replace /finance/assets/建设银行存款 为(回溯到言灵前的值，通过读取变量获取当前值再做减法)
+
+撤销示例(错误): 撤销某言灵时把 /finance/assets 整体替换为 { 现金:200, 建设银行存款:800 }
+  这样会抹掉所有后来的财务变动，导致数据丢失
+
+§16 数值状态联动规则
+
+时间推进时自动更新 stats:
+  每过1小时: fatigue+2, hunger-3, hygiene-1
+  睡觉(连续4h+无活动): fatigue-40, hygiene-3
+  进食: hunger+30(最多100)
+  洗澡: hygiene+40(最多100)
+  fatigue>=80: status.physical改为"极度疲劳"
+  hunger<=20: status.physical改为"饥饿"
+  hygiene<=30: NPC可能注意到异味
+
+wealth_status根据finance.assets自动判定:
+  总资产<1万: 普通
+  1万~100万: 宽裕
+  100万~1亿: 富裕
+  1亿+: 巨富
+
+§17 人脉图谱规则
+
+当两个NPC之间产生关联(介绍认识/产生冲突/有共同经历):
+  写入路径: replace /connections 为完整数组
+  格式: { id: "conn_NNN", from: "角色A", to: "角色B", relation: "关系描述" }
+  一个人脉关系只记录一次(检查from+to组合是否已存在)
+  id格式: conn_001开始自增
+
+§18 时间线事件规则
+
+根据当前日期(/time)检查calendar_events中是否有当日事件:
+  如果是特殊日期(节日/纪念日): 在叙事中自然融入节日氛围
+  玩家可以添加自定义事件: replace /calendar_events 为新数组
+  日期格式严格使用 YYYY-MM-DD
+
+§19 财务操作铁律
+
+财务数据(finance.assets)只在以下情况下修改:
+  1. 玩家使用言灵明确增加了某账户余额(新增/修改某个账户的值)
+  2. 玩家进行了实际消费(扣除对应账户的值)
+  3. 玩家使用言灵撤销了某条财务言灵(对该账户做精确的反向操作)
+任何情况下都禁止将 finance.assets 整个对象替换为初始值或覆盖所有账户。每个账户独立修改。
+每条交易必须写入 finance.transactions 数组(使用 replace 整体替换，合并新交易到已有数组)。

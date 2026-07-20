@@ -15,6 +15,9 @@ $(async function() {
     } catch(e) { console.warn('[VarObs]', e); }
   }
 
+  if (typeof eventOn === 'function' && typeof Mvu !== 'undefined' && Mvu.events) {
+    eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, function() { setTimeout(capture, 200); });
+  }
   if (typeof eventOn === 'function' && typeof tavern_events !== 'undefined') {
     eventOn(tavern_events.VARIABLE_UPDATE_ENDED, function() { setTimeout(capture, 200); });
   }
