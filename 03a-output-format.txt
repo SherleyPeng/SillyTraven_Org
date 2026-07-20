@@ -12,6 +12,8 @@
   remove:  { op: "remove",  path: "/..." }
 
 禁止:
+  - ⛔ 在 <UpdateVariable> 与 <JSONPatch> 之间插入任何其他标签（尤其是 <Analysis>）——只允许直接内嵌 <JSONPatch>
+  - ⛔ 输出 <Analysis> 标签——该标签由独立系统生成，你输出会导致 MVU 解析失败、数据丢失
   - 用 add 操作向数组末尾追加元素(会被执行两次造成重复)——应 replace 完整数组
   - 用 markdown 围栏包裹 JSON
   - 整对象覆盖(改单字段只 patch 该字段)

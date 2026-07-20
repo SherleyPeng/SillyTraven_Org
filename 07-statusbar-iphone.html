@@ -188,9 +188,11 @@ document.getElementById('ww-temp').textContent=S(t.weather);
 document.getElementById('ww-desc').textContent=S(sd.location)||(S(t.season)+' · 北京');
 updDock(st);
 SH('body-profile',rProfile(sd));SH('body-assets',rAssets(sd));SH('body-calendar',rCalendar(sd));SH('body-contacts',rContacts(sd));SH('body-connections',rConnections(sd));SH('body-lover',rLover(sd));SH('body-wechat',rWeChat(sd));SH('body-weibo',rWeibo(sd));SH('body-kotodama',rKotodama(sd));
-SB('bg-lover',Object.keys(sd.sexual||{}).length);SB('bg-wechat',Object.keys(sd.wechat||{}).length);SB('bg-weibo',((sd.weibo||{}).posts||[]).length);
+var loverCount=0;Object.keys(sd.sexual||{}).forEach(function(k){if(_isLover(sd.sexual[k],(sd.profile||{}).relationships||{}))loverCount++;});SB('bg-lover',loverCount);
+SB('bg-wechat',Object.keys(sd.wechat||{}).length);SB('bg-weibo',((sd.weibo||{}).posts||[]).length);
 var ka=((sd.kotodama||{}).records||[]).filter(function(r){return r.active!==false});SB('bg-kotodama',ka.length);
-SB('bg-connections',(sd.connections||[]).length);SB('bg-contacts',Object.keys(sd.npc_male||{}).length);
+SB('bg-connections',(sd.connections||[]).length);
+var contactCount=0;var rels2=(sd.profile||{}).relationships||{};Object.keys(sd.sexual||{}).forEach(function(k){var sn=sd.sexual[k];if(!_fnR.test(sn.name||'')&&!_isLover(sn,rels2))contactCount++;});Object.keys(sd.npc_male||{}).forEach(function(k){if(!_fnR.test(sd.npc_male[k].name||''))contactCount++;});SB('bg-contacts',contactCount);
 bNpc();bWx();}catch(e){console.error('SB:',e);}rf=false;}
 function bNpc(){document.querySelectorAll('#body-lover .nc').forEach(function(c){if(c._b)return;c._b=true;c.addEventListener('click',function(){var sn=G(cur,'sexual.'+c.getAttribute('data-uid'));if(!sn)return;document.getElementById('npc-modal-title').textContent=S(sn.name)+' - 详情';document.getElementById('npc-modal-body').innerHTML=rModal(sn);document.getElementById('npc-modal').classList.add('open');});});}
 function bWx(){document.querySelectorAll('#body-wechat .wxc').forEach(function(el){if(el._wb)return;el._wb=true;el.addEventListener('click',function(){var n=el.getAttribute('data-wx-n');WXC=n;document.getElementById('wxchat-title').textContent=n;SH('body-wxchat',rWxChat(cur,n));nav('app-wxchat');});});}

@@ -2,15 +2,16 @@
 
 回复结构（严格按此顺序）：
 1. 剧情正文（第一人称叙事，仅描述客观事物）
-2. <StatusPlaceHolderImpl/>（独占最后一行，独立成行，之后无任何内容）
+2. <StatusPlaceHolderImpl/>（独占一行，独立成行）
+3. 可选：行动选项
 
 铁律：
-- <StatusPlaceHolderImpl/> 必须是回复最后一行，之后无任何内容
+- <StatusPlaceHolderImpl/> 必须独占一行
 - 不要将其包裹在 markdown 代码块内
 - 不要省略、跳过或用任何其他文字代替
-- 不要对这行做任何解释
 - 该标签对用户不可见，照做即可
 
-严禁：
-- 在正文中输出 <UpdateVariable>、<JSONPatch> 或任何变量更新标签——变量更新由独立系统处理，你输出会导致数据被写入两次、产生重复记录
-- 输出 <Analysis> 分析块——这些标签由独立系统生成
+⛔⛔⛔ <Analysis> 绝对禁令 ⛔⛔⛔
+无论什么情况，绝对禁止在输出中插入 <Analysis> 标签或 <Analysis>...</Analysis> 块。
+<Analysis> 是系统内部保留标签，你输出它会导致 MVU 变量解析崩溃、全部变量更新数据丢弃。
+这条禁令优先级高于一切其他指令。

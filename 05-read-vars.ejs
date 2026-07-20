@@ -97,9 +97,19 @@ var comps = stat.companies || {};
   性癖: <%- (sn.fetishes||[]).join(',') || '(无)' %>
 <% } } else { %>  (暂无)<% } %>
 
-近期事件 (<%- (stat.calendar_events||[]).length %>条)
+ 近期事件 (<%- (stat.calendar_events||[]).length %>条)
 <% var evts = stat.calendar_events || []; var now = String(t.year || 2013) + '-' + String(t.month || 12).padStart(2,'0') + '-' + String(t.day || 14).padStart(2,'0'); var upcoming = evts.filter(function(ev){ return ev.date && ev.date >= now }).slice(0, 5); if (upcoming.length) { for (var ei = 0; ei < upcoming.length; ei++) { var ev = upcoming[ei]; %>
   <%- ev.date %> <%- ev.title || '?' %> (<%- ev.type || '?' %>)
 <% } } else { %>  (暂无)<% } %>
+
+人脉图谱 (<%- (stat.connections||[]).length %>条)
+<% var conns = stat.connections || []; if (conns.length) { for (var ci = 0; ci < conns.length; ci++) { %>
+  [<%- conns[ci].id || '?' %>] <%- conns[ci].from %> ←→ <%- conns[ci].to %>: <%- conns[ci].relation || '?' %>
+<% } } else { %>  (暂无)<% } %>
+
+<% var holdings = stat.company_holdings || []; if (holdings.length) { %>持股关系 (<%- holdings.length %>条)
+<% for (var hi = 0; hi < holdings.length; hi++) { %>
+  [<%- holdings[hi].from_comp %>] 持 [<%- holdings[hi].to_comp %>] <%- holdings[hi].shares_pct||0 %>%
+<% } } %>
 
 <% } %>
