@@ -22,8 +22,8 @@ with open(card_path, 'r', encoding='utf-8') as f:
 data = card['data']
 
 # ── 1. Update character_version ──
-data['character_version'] = '1.7.2'
-print('character_version -> 1.7.2')
+data['character_version'] = '1.7.3'
+print('character_version -> 1.7.3')
 
 # ── 2. Update world book entries ──
 entries = data['character_book']['entries']
@@ -147,7 +147,7 @@ else:
             break
 
 # ── 4. Write updated card JSON ──
-out_json_path = os.path.join(BASE, 'RealWorld_v1.7.2.card.json')
+out_json_path = os.path.join(BASE, 'RealWorld_v1.7.3.card.json')
 with open(out_json_path, 'w', encoding='utf-8') as f:
     json.dump(card, f, ensure_ascii=False)
 print(f'Written: {out_json_path} ({os.path.getsize(out_json_path)} bytes)')
@@ -190,7 +190,7 @@ tEXt_chunk = struct.pack('>I', len(text_data)) + chunk_body + crc
 
 new_png = stripped_png[:iend_pos-4] + tEXt_chunk + stripped_png[iend_pos-4:]
 
-out_png_path = os.path.join(BASE, '..', 'RealWorld_v1.7.2.png')
+out_png_path = os.path.join(BASE, '..', 'RealWorld_v1.7.3.png')
 with open(out_png_path, 'wb') as f:
     f.write(new_png)
 

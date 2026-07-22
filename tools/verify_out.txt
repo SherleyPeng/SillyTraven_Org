@@ -1,0 +1,18 @@
+﻿uid 1 contains "wechat:": True
+uid 1 contains "finance:": True
+uid 1 contains "cash:": True
+uid 1 contains "accounts:": True
+uid 1 contains "location:": True
+uid 2 "<analysis>": True
+uid 2 "情况A": True
+uid 2 "情况B": True
+uid 2 "wx_NNN": True
+uid 2 "禁止 Analysis": True
+uid 11 "wechat": True
+uid 11 "微信聊天": True
+uid 11 "微博动态": True
+uid 11 "var wx =": True
+uid 15 "wx_": True
+uid 15 "wx_NNN": True
+uid 15 "wechat 特殊规则": True
+uid 15 "wx_前缀": False

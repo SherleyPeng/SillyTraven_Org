@@ -112,4 +112,16 @@ var comps = stat.companies || {};
   [<%- holdings[hi].from_comp %>] 持 [<%- holdings[hi].to_comp %>] <%- holdings[hi].shares_pct||0 %>%
 <% } } %>
 
+微信聊天 (<%- Object.keys(stat.wechat||{}).length %>个联系人)
+<% var wx = stat.wechat || {}; var wxKeys = Object.keys(wx); if (wxKeys.length) { for (var wi = 0; wi < wxKeys.length; wi++) { var wc = wx[wxKeys[wi]]; var wm = wc.messages || []; %>
+  [<%- wc.name || wxKeys[wi] %>] <%- wm.length %>条消息
+<% var recent = wm.slice(-3); for (var wj = 0; wj < recent.length; wj++) { %>
+  <%- recent[wj].time || '?' %> <%- recent[wj].from %>: <%- recent[wj].text %>
+<% } } } else { %>  (暂无)<% } %>
+
+微博动态 (<%- ((stat.weibo||{}).posts||[]).length %>条)
+<% var wb = stat.weibo || {}; var wbPosts = wb.posts || []; if (wbPosts.length) { for (var wpi = 0; wpi < wbPosts.length; wpi++) { %>
+  [<%- wbPosts[wpi].category || '?' %>] <%- wbPosts[wpi].title %> <%- wbPosts[wpi].time || '?' %> <%- wbPosts[wpi].source || '' %><% if (wbPosts[wpi].summary) { %> | <%- wbPosts[wpi].summary %><% } %>
+<% } } else { %>  (暂无)<% } %>
+
 <% } %>

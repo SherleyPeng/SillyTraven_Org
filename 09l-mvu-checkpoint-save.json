@@ -1,0 +1,22 @@
+{
+    "type": "script",
+    "enabled": true,
+    "name": "保存变量快照",
+    "id": "mvu-checkpoint-save",
+    "content": "var _ckptAutoSave = true;\n\n$(async function() {\n  if (typeof eventOn === 'function') {\n    eventOn(getButtonEvent('保存变量快照'), async function() {\n      try {\n        await waitGlobalInitialized('Mvu');\n        var cur = Mvu.getMvuData({ type: 'message', message_id: 'latest' });\n        if (!cur || !cur.stat_data || Object.keys(cur.stat_data).length === 0) {\n          toastr.warning('当前无变量数据可保存');\n          return;\n        }\n        var clone = JSON.parse(JSON.stringify(cur.stat_data));\n        insertOrAssignVariables({ _mvu_checkpoint: clone }, { type: 'chat' });\n        var ts = new Date().toLocaleString();\n        insertOrAssignVariables({ _mvu_checkpoint_time: ts }, { type: 'chat' });\n        toastr.success('变量快照已保存 (' + ts + ')');\n      } catch(e) {\n        toastr.error('保存失败: ' + e.message);\n      }\n    });\n  }\n});\n$(window).on('pagehide', function() {});\nexport {};",
+    "info": "在任意轮次手动保存当前MVU变量快照到chat变量中。创建分支前使用，分支后即可恢复。",
+    "button": {
+        "enabled": true,
+        "buttons": [
+            {
+                "name": "保存变量快照",
+                "visible": true
+            }
+        ]
+    },
+    "data": {},
+    "export_with": {
+        "data": true,
+        "button": true
+    }
+}

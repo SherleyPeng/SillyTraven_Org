@@ -2,29 +2,63 @@
 
 你必须输出变量更新。每轮回复必须包含以下容器，即使没有任何变化也要输出空数组 []。
 
-输出模板（直接复制该结构，无变化时用 []）：
-<UpdateVariable><JSONPatch>
+输出模板（必须严格遵守此结构，逐字符复制格式）：
+<UpdateVariable>
+<analysis>
+变量预分析——每行描述至少对应下方 JSONPatch 中的一个操作
+</analysis>
+<JSONPatch>
 [
   { "op": "replace", "path": "/...", "value": ... }
 ]
-</JSONPatch></UpdateVariable>
+</JSONPatch>
+</UpdateVariable>
+
+【致命错误——严禁以下行为】
+  ✕ 绝对禁止用 markdown 代码围栏包裹 JSON（```json ... ```）—— 这会导致变量存储完全失败
+  ✕ 绝对禁止把 JSON 放在 <UpdateVariable> 标签外面
+  ✕ 绝对禁止省略 <UpdateVariable> 和 <JSONPatch> 标签
+  ✓ 正确做法: JSON 必须裸露在 <JSONPatch>...</JSONPatch> 标签内部，前后不能有任何 markdown 围栏
+  ✓ 输出完毕 <UpdateVariable> 块后，不要在其前后输出任何解释文字
 
 操作:
-  add:     { "op": "add",     "path": "/...", "value": ... }
-  replace: { "op": "replace", "path": "/...", "value": ... }
-  remove:  { "op": "remove",  "path": "/..." }
+  add:     { "op": "add",     "path": "/...", "value": ... }   — 新增字段/record项
+  replace: { "op": "replace", "path": "/...", "value": ... }   — 替换已存在路径的值
+  remove:  { "op": "remove",  "path": "/..." }                 — 删除指定路径
+  move:    { "op": "move",    "from": "/...", "path": "/..." } — 字段迁移
 
-⚠️ 容器写入规则: sexual properties vehicles companies finance/accounts profile/relationships npc_male wechat 这些容器不支持 add/remove 单个 key，必须用 replace 整个父容器。示例: { "op": "replace", "path": "/sexual", "value": { "char_001": {...} } }
+replace 铁律：路径必须已存在。路径不存在时用 add，不能 replace 到不存在的路径。
+
+⚠️ 容器写入规则: 以下容器不支持 add/remove/replace 单个 key，必须用 replace 整个父容器：
+  /sexual  /properties  /vehicles  /companies  /finance/accounts  /profile/relationships  /npc_male  /wechat
+
+容器 replace 示例:
+  { "op": "replace", "path": "/sexual", "value": { "char_001": { "name": "张三", "age": 25, ... } } }
+  此时 AI 必须先读取当前容器内容，合并新条目，再 replace 整个容器。
+
+微信(wechat)专项:
+  微信的 key 使用 wx_NNN 格式。但微信与其他容器不同——对话中每轮都可能新增消息。
+  wechat 操作分两种情况:
+
+  情况A——新增联系人(首次发消息):
+    必须 replace /wechat 整个容器:
+    { "op": "replace", "path": "/wechat", "value": { "wx_001": { "name": "刘亦菲", "messages": [
+      { "from": "我", "text": "你好", "time": "2013-12-14 14:30" }
+    ] } } }
+
+  情况B——已有联系人追加消息:
+    可直接 replace /wechat/<key>/messages 数组(因为该路径已存在):
+    先读取当前 messages 数组 → 合并新消息 → replace 整个 messages 数组
+    { "op": "replace", "path": "/wechat/wx_001/messages", "value": [ ...合并后的完整数组... ] }
+    注意: messages 数组用 replace 整体替换，不用 /- 追加(会被执行两次造成重复)
 
 禁止:
-  - 在 <UpdateVariable> 与 <JSONPatch> 之间插入任何标签或文字——<JSONPatch> 必须紧跟在 <UpdateVariable> 后面，中间不能有 <Analysis> 或任何其他内容
-  - 输出 <Analysis> 标签——绝对禁止，会直接导致变量存储失败
-  - 用 add 操作向数组末尾追加元素(会被执行两次造成重复)——应 replace 完整数组
+  - 用 add 操作向数组末尾追加元素(/-) —— 应 replace 完整数组
   - 用 markdown 围栏包裹 JSON
   - 整对象覆盖(改单字段只 patch 该字段)
   - JSON 注释
-  - 省略容器——即使无变量变化也必须输出 <UpdateVariable><JSONPatch>[]</JSONPatch></UpdateVariable>
-
+  - 省略容器 —— 即使无变量变化也必须输出 <UpdateVariable><analysis>无变化</analysis><JSONPatch>[]</JSONPatch></UpdateVariable>
+  - analysis 中说有变化但 JSONPatch 中遗漏对应操作(每行描述至少对应一个 patch)
 
 
 路径格式警告：路径必须以 / 开头。
