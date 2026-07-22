@@ -7,8 +7,9 @@
 :root{--bg:#f2f2f7;--fg:#fff;--glass:rgba(255,255,255,0.72);--glass2:rgba(255,255,255,0.55);--glass3:rgba(255,255,255,0.35);--border:rgba(0,0,0,0.06);--border2:rgba(0,0,0,0.10);--text:#1c1c1e;--dim:#8e8e93;--dimmer:#aeaeb2;--bright:#000;--blue:#007aff;--green:#34c759;--red:#ff3b30;--orange:#ff9500;--pink:#ff2d55;--purple:#af52de;--teal:#5ac8fa;--yellow:#ffcc00;--r:14px;--rs:10px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.phone-wrap{position:relative;margin:4px auto;width:440px;height:700px;perspective:900px}
-.phone-body{width:440px;height:700px;border-radius:48px;position:relative;overflow:hidden;box-shadow:0 0 0 3px #d1d1d6,0 0 0 5px #e5e5ea,0 0 0 6px #f2f2f7,0 10px 40px rgba(0,0,0,0.18),0 24px 72px rgba(0,0,0,0.10);transform:rotateX(2deg)}
+/* iPad Proportions */
+.phone-wrap{position:relative;margin:4px auto;width:600px;height:780px;perspective:900px}
+.phone-body{width:600px;height:780px;border-radius:48px;position:relative;overflow:hidden;box-shadow:0 0 0 3px #d1d1d6,0 0 0 5px #e5e5ea,0 0 0 6px #f2f2f7,0 10px 40px rgba(0,0,0,0.18),0 24px 72px rgba(0,0,0,0.10);transform:rotateX(2deg)}
 .phone-body::before{content:'';position:absolute;inset:-3px;border-radius:51px;background:linear-gradient(180deg,#c7c7cc 0%,#d1d1d6 30%,#e5e5ea 50%,#d1d1d6 70%,#c7c7cc 100%);z-index:-1}
 .phone-body::after{content:'';position:absolute;left:-8px;top:140px;width:4px;height:36px;background:#c7c7cc;border-radius:2px 0 0 2px;box-shadow:0 48px 0 0 #c7c7cc,0 96px 0 0 #c7c7cc}
 .phone-wrap::before{content:'';position:absolute;right:-8px;top:160px;width:4px;height:60px;background:#c7c7cc;border-radius:0 2px 2px 0;z-index:10}
@@ -47,14 +48,14 @@ body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMac
 .bdg{position:absolute;top:-4px;right:-2px;min-width:18px;height:18px;background:var(--red);color:#fff;border-radius:9px;font-size:10px;font-weight:600;display:none;align-items:center;justify-content:center;padding:0 5px;z-index:5;border:2px solid #fff}.bdg.on{display:flex}
 
 /* === BOTTOM DOCK — Status Display === */
-.dock{background:rgba(255,255,255,0.65);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.8);border-radius:24px;padding:14px 22px;margin:0 12px 14px;display:flex;gap:0;z-index:2}
-.dock .v-g{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%}
-.dock .v-item{display:flex;flex-direction:column;align-items:center;gap:3px}
-.dock .v-icon{font-size:14px;line-height:1}
-.dock .v-bar{width:100%;height:3px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden}
-.dock .v-fill{height:100%;border-radius:2px;transition:width .4s}
-.dock .v-pct{font-size:9px;font-weight:600;color:var(--text)}
-.dock .v-label{font-size:8px;color:var(--dim);letter-spacing:.3px}
+.dock{background:rgba(255,255,255,0.65);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.8);border-radius:24px;padding:16px 24px;margin:0 0 14px;display:flex;gap:0;z-index:2}
+.dock .v-g{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;width:100%}
+.dock .v-item{display:flex;flex-direction:column;align-items:center;gap:5px}
+.dock .v-icon{font-size:22px;line-height:1}
+.dock .v-bar{width:100%;height:8px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden}
+.dock .v-fill{height:100%;border-radius:4px;transition:width .4s}
+.dock .v-pct{font-size:13px;font-weight:700;color:var(--text)}
+.dock .v-label{font-size:10px;color:var(--dim);letter-spacing:.5px;font-weight:500}
 .dock .v-s{background:linear-gradient(90deg,#34c759,#5ac8fa)}.v-m{background:linear-gradient(90deg,#007aff,#af52de)}.v-f{background:linear-gradient(90deg,#ffcc00,#ff9500)}.v-h{background:linear-gradient(90deg,#ff9500,#ff3b30)}.v-y{background:linear-gradient(90deg,#5ac8fa,#007aff)}
 
 /* App Pages */
