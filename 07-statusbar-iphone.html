@@ -43,9 +43,9 @@ body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMac
 .app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 0;padding:0 4px;margin-bottom:10px;width:100%}
 .ai{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .15s;position:relative}
 .ai:active{transform:scale(.85)}
-.ai .ic{width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;position:relative;overflow:hidden;background:rgba(255,255,255,0.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.8);color:#444;text-shadow:0 1px 2px rgba(255,255,255,0.6)}
+.ai .ic{width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;position:relative;background:rgba(255,255,255,0.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.8);color:#444;text-shadow:0 1px 2px rgba(255,255,255,0.6)}
 .ai .lb{font-size:10px;color:var(--text);text-align:center;line-height:1.2;font-weight:500}
-.bdg{position:absolute;top:-4px;right:-2px;min-width:18px;height:18px;background:var(--red);color:#fff;border-radius:9px;font-size:10px;font-weight:600;display:none;align-items:center;justify-content:center;padding:0 5px;z-index:5;border:2px solid #fff}.bdg.on{display:flex}
+.bdg{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;background:var(--red);color:#fff;border-radius:9px;font-size:10px;font-weight:600;display:none;align-items:center;justify-content:center;padding:0 5px;z-index:5;border:2px solid #fff}.bdg.on{display:flex}
 
 /* === BOTTOM DOCK — Status Display === */
 .dock{background:rgba(255,255,255,0.65);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.8);border-radius:24px;padding:16px 24px;margin:0 0 14px;display:flex;gap:0;z-index:2}
@@ -104,15 +104,15 @@ body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMac
 <div class="ww"><div class="wi" id="ww-icon">☀️</div><div class="wt" id="ww-temp">晴</div><div class="wd" id="ww-desc">冬 · 北京</div></div>
 <div class="h-spacer"></div>
 <div class="app-grid">
-<div class="ai" data-app="profile"><div class="ic">👤</div><div class="lb">人物</div><div class="bdg" id="bg-profile"></div></div>
+<div class="ai" data-app="profile"><div class="ic">👤<div class="bdg" id="bg-profile"></div></div><div class="lb">人物</div></div>
 <div class="ai" data-app="assets"><div class="ic">🏦</div><div class="lb">资产</div></div>
 <div class="ai" data-app="calendar"><div class="ic" style="font-size:20px">📅</div><div class="lb">日历</div></div>
-<div class="ai" data-app="contacts"><div class="ic">📇</div><div class="lb">通讯录</div><div class="bdg" id="bg-contacts"></div></div>
+<div class="ai" data-app="contacts"><div class="ic">📇<div class="bdg" id="bg-contacts"></div></div><div class="lb">通讯录</div></div>
 
-<div class="ai" data-app="lover"><div class="ic">💕</div><div class="lb">Lover</div><div class="bdg" id="bg-lover"></div></div>
-<div class="ai" data-app="wechat"><div class="ic">💬</div><div class="lb">微信</div><div class="bdg" id="bg-wechat"></div></div>
-<div class="ai" data-app="weibo"><div class="ic">📰</div><div class="lb">微博</div><div class="bdg" id="bg-weibo"></div></div>
-<div class="ai" data-app="kotodama"><div class="ic">✨</div><div class="lb">言灵</div><div class="bdg" id="bg-kotodama"></div></div>
+<div class="ai" data-app="lover"><div class="ic">💕<div class="bdg" id="bg-lover"></div></div><div class="lb">Lover</div></div>
+<div class="ai" data-app="wechat"><div class="ic">💬<div class="bdg" id="bg-wechat"></div></div><div class="lb">微信</div></div>
+<div class="ai" data-app="weibo"><div class="ic">📰<div class="bdg" id="bg-weibo"></div></div><div class="lb">微博</div></div>
+<div class="ai" data-app="kotodama"><div class="ic">✨<div class="bdg" id="bg-kotodama"></div></div><div class="lb">言灵</div></div>
 </div>
 
 <!-- Bottom Dock — Status Bars -->

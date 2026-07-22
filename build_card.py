@@ -22,8 +22,8 @@ with open(card_path, 'r', encoding='utf-8') as f:
 data = card['data']
 
 # ── 1. Update character_version ──
-data['character_version'] = '1.7.3'
-print('character_version -> 1.7.3')
+data['character_version'] = '1.7.4'
+print('character_version -> 1.7.4')
 
 # ── 2. Update world book entries ──
 entries = data['character_book']['entries']
@@ -147,7 +147,7 @@ else:
             break
 
 # ── 4. Write updated card JSON ──
-out_json_path = os.path.join(BASE, 'RealWorld_v1.7.3.card.json')
+out_json_path = os.path.join(BASE, 'RealWorld_v1.7.4.card.json')
 with open(out_json_path, 'w', encoding='utf-8') as f:
     json.dump(card, f, ensure_ascii=False)
 print(f'Written: {out_json_path} ({os.path.getsize(out_json_path)} bytes)')
@@ -159,7 +159,7 @@ with open(out_json_path, 'r', encoding='utf-8') as f:
 
 card_base64 = base64.b64encode(card_json_str.encode('utf-8')).decode('ascii')
 
-png_path = os.path.join(BASE, 'RealWorld.png')
+png_path = r'I:\Comfy-Desktop\ComfyUI-Shared\output\image\2026-07-19\ComfyUI_00007_.png'
 with open(png_path, 'rb') as f:
     png_data = f.read()
 
@@ -190,7 +190,7 @@ tEXt_chunk = struct.pack('>I', len(text_data)) + chunk_body + crc
 
 new_png = stripped_png[:iend_pos-4] + tEXt_chunk + stripped_png[iend_pos-4:]
 
-out_png_path = os.path.join(BASE, '..', 'RealWorld_v1.7.3.png')
+out_png_path = os.path.join(BASE, '..', 'RealWorld_v1.7.4.png')
 with open(out_png_path, 'wb') as f:
     f.write(new_png)
 
