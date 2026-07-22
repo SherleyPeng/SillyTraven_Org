@@ -74,12 +74,12 @@ var comps = stat.companies || {};
 
 男性NPC (<%- mKeys.length %>人)
 <% if (mKeys.length) { for (var mi=0; mi<mKeys.length; mi++) { var mn = m[mKeys[mi]]; %>
-  [<%- mKeys[mi] %>] <%- mn.name %>  <%- mn.age %>岁  <%- mn.occupation %>  <%- mn.social_status %>
+  [<%- mKeys[mi] %>] <%- mn.name %>  <%- mn.age %>岁  [<%- mn.entity_type||'npc' %>]  <%- mn.occupation %>  <%- mn.social_status %>
 <% } } else { %>  (暂无)<% } %>
 
 女性NPC (<%- sKeys.length %>人)
 <% if (sKeys.length) { for (var si=0; si<sKeys.length; si++) { var sn = s[sKeys[si]]; var bp = sn.body_parts || {}; var br = bp.breasts || {}; var nip = bp.nipples || {}; var vag = bp.vagina || {}; var ut = bp.uterus || {}; var an = bp.anus || {}; var mnst = sn.menstrual || {}; var exp = sn.experience || {}; var eu = sn.experience_with_user || {}; %>
-  [<%- sKeys[si] %>] <%- sn.name %>  <%- sn.age %>岁  <%- sn.birth_year %>.<%- sn.birth_month %>.<%- sn.birth_day %>
+  [<%- sKeys[si] %>] <%- sn.name %>  <%- sn.age %>岁  [<%- sn.entity_type||'npc' %>]  <%- sn.birth_year %>.<%- sn.birth_month %>.<%- sn.birth_day %>
   外貌: <%- sn.appearance || '?' %>
   穿着: <%- sn.outfit || '?' %>
   性格: <%- sn.personality || '?' %>

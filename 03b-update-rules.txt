@@ -58,7 +58,7 @@ stat_data:
     女性NPC结构详见 §A
 
   npc_male: 半开放 字典容器 key=mnpc_NNN
-    value: { name, age, occupation, social_status }
+    value: { name, age, entity_type: enum(npc/real_person, 默认npc), occupation, social_status }
 
 
   wechat: 半开放 字典容器 key=wx_NNN
@@ -84,6 +84,7 @@ stat_data:
 
 sexual.<char_uid>:
   name: string, age: number
+  entity_type: enum(npc/real_person, 默认npc)
   birth_year: number, birth_month: number, birth_day: number
   appearance: string, outfit: string, personality: string
   is_virgin: boolean, first_partner: string|null
@@ -226,6 +227,8 @@ G 处女-经验一致性(见§6.4c): is_virgin=false → total>=1 且 first_part
   1. 按名字扫描全库: 检查是否已有同名人
   2. 命中: replace 该条目的 path(不新建), 不增计数器
   3. 未命中: 读计数器 -> 计数器+1 -> 合并新旧条目, replace 整个父容器
+  4. 查重警觉: 若扫描命中但与当前场景的身份/职业/年龄完全不符(如: 当前是夜总会陪酒女, 命中条目是30岁已婚女教师), 视为误匹配——不replace, 按未命中走新建
+  5. 名人碰撞: 若当前NPC名字与已知现实名人同名, 先判是否就是该名人本人(见§9.1+§10)。若不是本人, 绝对禁止replace, 按未命中新建(且名字应改为花名/谐音, 见§9.1)
 
   ⚠️ 关键: 对以下容器新增条目时, 必须用 replace 操作整个父容器, 不能 add/remove 或 replace 单个 key:
     /sexual  /properties  /vehicles  /companies  /finance/accounts  /profile/relationships  /npc_male  /wechat
@@ -258,6 +261,30 @@ wechat 特殊规则——追加消息到已有联系人:
   - 报出真名 + 有实质互动
   - 明确会再登场
   - {{user}}表现出深入互动意图
+
+9.1 NPC命名铁律(防名人撞名)
+
+  生成非名人NPC(性工作者/路人/店员/普通市民等)时, 绝对禁止直接使用现实名人的真名:
+    禁止: 性工作者叫"刘亦菲""杨幂""迪丽热巴"等任何现实名人真名
+    禁止: 路人叫"周杰伦""王思聪"等
+    禁止: 任何非该名人本人的角色使用该名人的真实姓名
+
+  若要暗示NPC长得像某名人, 使用以下方式之一:
+    花名/艺名: "小刘亦菲" "海淀杨幂" "朝阳迪丽热巴"
+    谐音字: "刘一菲" "刘奕菲" "刘亦非"(改至少一字, 不完整匹配)
+    外号: "小仙女" "幂幂"(仅当上下文明确区分时)
+    通用名: "小刘" "菲菲" "小幂"(去姓氏化, 不会与全名查重碰撞)
+
+   铁律: 非名人NPC的name字段绝不可与任何现实名人真名完全相同
+  后果: 若违反, 变量层§8扫名查重会命中该名人的已有条目, 将名人数据覆盖为NPC数据, 造成数据损坏
+
+  所有NPC的entity_type必须填写:
+    虚构角色(包括性工作者/路人/店员/普通市民等): entity_type="npc"
+    现实名人本人: entity_type="real_person"(见§10)
+    绝对禁止: entity_type="real_person"的角色使用虚构数据, 或entity_type="npc"的角色使用名人真名
+
+  {{user}}遇到该名人本人时, 按§10名人规则建档, 此时使用真名+entity_type="real_person"。
+  本人和"长得像的NPC"是两条不同的变量条目, 不可混淆。
 
 男性NPC建档: 一次填满 { name, age, occupation, social_status }
   social_status 描述与{{user}}当前社交关系, 如"室友/火星时代同学/求职同行"
@@ -293,6 +320,19 @@ wechat 特殊规则——追加消息到已有联系人:
 §10 名人数据参考规则
 
 当故事中出现现实名人时:
+
+10.0 名人建档要求:
+  该名人以本人身份出现(非长得像的NPC)时, 按女性NPC完整结构§A建档, 额外要求:
+    entity_type 必须设为 "real_person" (不可为默认的"npc")
+    name 使用该名人的真实姓名
+    其余字段按10.1~10.5填写
+  若只是报道/新闻/背景提及(非本人出场), 不建档, 仅叙事提及即可
+
+10.0b 实体分类保护:
+  entity_type 是本世界区分"虚构角色"与"现实人物"的核心字段
+  real_person = 该条目存储的是真实公众人物的数据, 受特殊保护(不可被普通NPC覆盖)
+  npc = 该条目是虚构原创角色, 正常参与游戏互动
+  变量层§8查重时, entity_type不同视为不同实体(即使同名)
 
 10.1 基础数据(必须真实):
   姓名, 出生日期, 年龄: 与公开资料严格一致

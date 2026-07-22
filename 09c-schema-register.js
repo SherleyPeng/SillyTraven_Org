@@ -1,7 +1,8 @@
-// RealWorld Schema v1.4.0 (register for MVU pipeline)
-// ═══ RealWorld 角色卡 Schema v1.4.0 ═══
+// RealWorld Schema v1.5.0 (register for MVU pipeline)
+// ═══ RealWorld 角色卡 Schema v1.5.0 ═══
 // v1.0: 初版
 // v1.4.0: Finance重构(cash+accounts/UID)+properties/vehicles/companies/company_holdings
+// v1.5.0: entity_type字段(区分npc/real_person)
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
@@ -93,6 +94,7 @@ const ExperienceWithUserSchema = z.object({ total: num, oral: num, vaginal: num,
 
 const FemaleNPCSchema = z.object({
   name: str(), age: num, birth_year: num, birth_month: num, birth_day: num,
+  entity_type: z.enum(['npc', 'real_person']).default('npc').catch('npc'),
   appearance: str(), outfit: str(), personality: str(),
   is_virgin: bool(true), first_partner: z.string().nullable().default(null).catch(null),
   menstrual: MenstrualSchema,
@@ -102,7 +104,7 @@ const FemaleNPCSchema = z.object({
   fetishes: z.array(z.string()).default([]).catch([])
 }).default({}).catch({});
 
-const MaleNPCSchema = z.object({ name: str(), age: num, occupation: str(), social_status: str() }).default({}).catch({});
+const MaleNPCSchema = z.object({ name: str(), age: num, entity_type: z.enum(['npc', 'real_person']).default('npc').catch('npc'), occupation: str(), social_status: str() }).default({}).catch({});
 
 // ── Misc ──
 const KotodamaRecordSchema = z.object({ id: num, time: str(), command: str(), result: str(), active: bool(true) }).default({}).catch({});
